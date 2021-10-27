@@ -1,0 +1,20 @@
+Package: clarity2sims
+Title: Clarity 2.0 Simulation Functions
+Version: 0.0.1
+Authors@R: 
+    person("James", "Totterdell", , "james.totterdell@sydney.edu.au", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Functions for Clarity 2.0 simulations.
+SystemRequirements: stan
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Imports: 
+    cmdstanr,
+    data.table,
+    matrixStats,
+    mvtnorm,
+    parallel,
+    posterior,
+    rstan
