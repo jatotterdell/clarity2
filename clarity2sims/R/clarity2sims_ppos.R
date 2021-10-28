@@ -11,10 +11,35 @@ impute_data <- function(npred, post_p) {
   K <- dim(post_p)[2]
   B <- dim(post_p)[3]
   yagg <- array(0, dim = list(N, K, B))
-  for(n in 1:N) {
+  for (n in 1:N) {
     yagg[n, , ] <- apply(post_p[n, , ], 2, function(j) stats::rmultinom(1, npred[n], prob = j))
   }
-  return(yagg)
+  return (yagg)
+}
+
+
+#' @title approximate_posterior
+#' @description Use Laplace approximation to posterior
+#' @param mod Stan model
+#' @param moddat Model data
+#' @return A list with posterior mean and covariance
+approximate_posterior <- function(mod, moddat) {
+  fit <- rstan::optimizing(mod, data = moddat, hessian = TRUE, draws = 0)
+  id <- grepl("beta_raw", colnames(fit$hessian))
+  M <- fit$par[grepl("beta\\[", names(fit$par))]
+  # If there's issues with covariance matrix just return NA
+  V <- tryCatch ({
+    H <- fit$hessian
+    invH <- solve(-H, tol = sqrt(.Machine$double.eps))[id, id]
+    v <- diag(moddat$prior_sd) %*% invH  %*% diag(moddat$prior_sd)
+    if (!isSymmetric(v)) {
+      crossprod(chol(v))
+    } else {
+      v
+    }
+  }, error = function(e) e)
+  if (inherits(V, "error")) V <- NA
+  return (list(M = M, V = V))
 }
 
 
@@ -32,31 +57,21 @@ calc_ppos <- function(mod, dat, yimp, epsilon = 0.975, n_draws = 0) {
   yobs <- dat$y
   pr_clt0 <- matrix(0, B, 3)
   Cmat <- rbind(c(0, 1), c(-1, 1))  # Or whatever contrast
-  for(b in 1:B) {
+  for (b in 1:B) {
     dat$y <- yobs + yimp[, , b]
-    fit <- rstan::optimizing(mod, data = dat, hessian = TRUE, draws = n_draws)
-    if(n_draws == 0) {
-      # Use numerical
-      id <- grepl("beta_raw", colnames(fit$hessian))
-      tryCatch({
-        invH <- solve(-fit$hessian + diag(sqrt(.Machine$double.eps), ncol(fit$hessian)))[id, id]
-      },
-      error = function(cond) {
-        return(matrix(NA, 1, 3))
-      })
-      V <- diag(dat$prior_sd) %*% invH  %*% diag(dat$prior_sd)
-      M <- fit$par[grepl("beta\\[", names(fit$par))]
+    fit <- approximate_posterior(mod, dat)
+    M <- fit$M
+    V <- fit$V
+    if (is.na(V)) {
+      pr_clt0[b, ] <- NA
+    } else {
       CM <- drop(Cmat %*% M)
       CVCt <- Cmat %*% V %*% t(Cmat)
       pr_clt0[b, -3] <- 1 - stats::pnorm(0, CM, sqrt(diag(CVCt)))
       pr_clt0[b, 3] <- mvtnorm::pmvnorm(lower = 0, mean = CM, sigma = CVCt)
-    } else {
-      # Use Monte Carlo
-      drw <- fit$theta_tilde
-      pr_clt0[b, ] <- matrixStats::colMeans2((drw[, grepl("beta\\[", colnames(drw))] %*% t(Cmat)) > 0)
     }
   }
-  return(pr_clt0)
+  return (pr_clt0)
 }
 
 
@@ -88,9 +103,9 @@ assess_futility <- function(mod, moddat, n, p, n_max, n_sim = 1, B = 500) {
     ppos <- calc_ppos(mod, moddat, yimp)
     pprob <- colMeans(post_draws[, grepl("beta\\[", colnames(post_draws))] < 0)
     ebeta <- colMeans(post_draws[, grepl("beta\\[", colnames(post_draws))])
-    return(list(ppos = ppos, pprob = pprob, ebeta = ebeta))
+    return (list(ppos = ppos, pprob = pprob, ebeta = ebeta))
   }, mc.cores = 15)
-  return(list(
+  return (list(
     ppos = simplify2array(lapply(res, function(x) x$ppos)),
     pprob = sapply(res, function(x) x$pprob),
     ebeta = sapply(res, function(x) x$ebeta)
@@ -166,7 +181,7 @@ sim_clarity2_ppos_trial <- function(
     post_p <- post_draws[, grepl("p\\[", colnames(post_draws))]
     post_alpha <- post_draws[, grepl("alpha", colnames(post_draws))]
     post_beta <- post_draws[, grepl("beta\\[", colnames(post_draws))]
-    if(i < n_int) {
+    if (i < n_int) {
       P <- aperm(array(c(post_p), dim = list(nrow(post_p), nrow(p), ncol(p))), c(2, 3, 1))
       x_imp <- table(factor(permuted_block_rand(p_assign, n_left[i], 2 * N)[["trt"]], levels = seq_len(N)))
       y_imp <- impute_data(x_imp, P[, , sample.int(dim(P)[3], size = B_ppos)])
@@ -212,7 +227,7 @@ sim_clarity2_ppos_trial <- function(
 
   y_obs <- y_obs[ind, , , drop = FALSE]
 
-  return(list(
+  return (list(
     alpha = list_as_dt(out_alpha),
     trial = list_as_dt(out_arm),
     contr = list_as_dt(out_ctr),

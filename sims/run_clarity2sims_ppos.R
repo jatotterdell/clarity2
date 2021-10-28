@@ -43,7 +43,8 @@ cfg <- CJ(
   eff_eps = 0.975,
   fut_eps = 0.025,
   eta = list(rep(0, 3),
-             c(0, 0, log(1.1))),
+             c(0, 0, log(1.1)),
+             c(0, 0, log(1.2))),
   sorted = FALSE
 )
 
@@ -68,9 +69,11 @@ for(z in run_row) {
   resl_alpha <- rbindlist(lapply(res, \(x) x[["alpha"]]), idcol = "trial")
   resl_contr <- rbindlist(lapply(res, \(x) x[["contr"]]), idcol = "trial")
   resl_trial <- rbindlist(lapply(res, \(x) x[["trial"]]), idcol = "trial")
+  resl_yobs  <- rbindlist(lapply(res, \(x) x[["yobs"]]), idcol = "trial")
   resl_alpha[, analysis := as.numeric(analysis)]
   resl_contr[, analysis := as.numeric(analysis)]
   resl_trial[, analysis := as.numeric(analysis)]
+  resl_yobs[, analysis := as.numeric(analysis)]
 
   end_time <- Sys.time()
 
@@ -79,6 +82,7 @@ for(z in run_row) {
     alpha = resl_alpha,
     contr = resl_contr,
     trial = resl_trial,
+    yobs = resl_yobs,
     runtime = end_time - start_time),
     paste0("~/out_files/clarity2_sims/ppos_",
            formatC(z, width = 2, flag = "0"), ".rds"))
