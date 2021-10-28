@@ -113,6 +113,7 @@ assess_futility <- function(mod, moddat, n, p, n_max, n_sim = 1, B = 500) {
 #' @param ... Additional arguments to rstan::sampling
 #' @return A list
 #' @importFrom rstan sampling
+#' @export
 sim_clarity2_ppos_trial <- function(
   mod,
   n_seq = seq(600, 2100, 300),

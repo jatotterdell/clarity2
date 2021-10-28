@@ -27,7 +27,7 @@ sim_clarity2_trial(
 
 \item{eff_eps}{Effectiveness threshold}
 
-\item{...}{Other arguments to cmdstanr::sample}
+\item{...}{Other arguments to cmdstanr::sample, e.g. adapt_delta, chains, etc.}
 }
 \value{
 A list of trial related data.tables
