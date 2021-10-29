@@ -8,7 +8,7 @@ sim_clarity2_ppos_trial(
   mod,
   n_seq = seq(600, 2100, 300),
   p_assign = rep(1/3, 3),
-  alpha = stats::qlogis(cumsum(c(16, 29, 32, 13, 2, 1, 1, 6)/100)[1:7]),
+  alpha = stats::qlogis(cumsum(c(16, 28, 32, 12, 2, 2, 2, 6)/100)[1:7]),
   eta = c(0, -0.5, 0.5),
   eff_eps = 0.975,
   fut_eps = 0.02,

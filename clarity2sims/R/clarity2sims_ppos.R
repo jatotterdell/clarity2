@@ -22,9 +22,19 @@ impute_data <- function(npred, post_p) {
 #' @description Use Laplace approximation to posterior
 #' @param mod Stan model
 #' @param moddat Model data
+#' @param collapse_levels Optimisation likely to fail if any outcome levels have zero observations.
+#' If this parameter is TRUE (default) then drops outcome levels with zero observations and shares
+#' the prior weight equally across all remaining levels
 #' @return A list with posterior mean and covariance
-approximate_posterior <- function(mod, moddat) {
+approximate_posterior <- function(mod, moddat, collapse_levels = TRUE) {
+  level_totals <- colSums(moddat$y)
+  if(collapse_levels & any(level_totals) == 0) {
+    moddat$y <- moddat$y[, level_totals != 0]
+    moddat$K <- sum(level_totals != 0)
+    moddat$prior_counts <- moddat$prior_counts[level_totals != 0] * sum(moddat$prior_counts) / sum(moddat$prior_counts[level_totals != 0])
+  }
   fit <- rstan::optimizing(mod, data = moddat, hessian = TRUE, draws = 0)
+  conv <- fit$return_code # Should check for convergence before summarising
   id <- grepl("beta_raw", colnames(fit$hessian))
   M <- fit$par[grepl("beta\\[", names(fit$par))]
   # If there's issues with covariance matrix just return NA
@@ -133,7 +143,7 @@ sim_clarity2_ppos_trial <- function(
   mod,
   n_seq = seq(600, 2100, 300),
   p_assign = rep(1 / 3, 3),
-  alpha = stats::qlogis(cumsum(c(16, 29, 32, 13, 2, 1, 1, 6) / 100)[1:7]),
+  alpha = stats::qlogis(cumsum(c(16, 28, 32, 12, 2, 2, 2, 6) / 100)[1:7]),
   eta = c(0, -0.5, 0.5),
   eff_eps = 0.975,
   fut_eps = 0.02,

@@ -5,18 +5,21 @@ library(data.table)
 library(parallel)
 library(matrixStats)
 library(mvtnorm)
+library(pbapply)
 library(optparse)
+
 
 # ----- Command line arguments -----
 option_list = list(
-  make_option(c("-c", "--cores"), type="integer", default=15,
+  make_option(c("-c", "--cores"), type="integer", default=14,
               help="number of cores to use", metavar="character"),
-  make_option(c("-n", "--nsim"), type="integer", default=100,
+  make_option(c("-n", "--nsim"), type="integer", default=1000,
               help="number of simulations to run under each configuration", metavar="character")
 );
 opt <- parse_args(OptionParser(option_list = option_list))
 num_cores <- opt$cores
 num_sims  <- opt$nsim
+
 
 # ----- Compile the model -----
 ordmod <- clarity2sims:::compile_rstan_mod()
@@ -36,32 +39,37 @@ mod <- list(ordmod, ordmodat)
 RNGkind("L'Ecuyer-CMRG")
 set.seed(613570)
 
+
 # ----- Specify configurations to explore -----
 cfg <- CJ(
   sims = num_sims,
   n_seq = list(seq(600, 2100, 300)),
   eff_eps = 0.975,
   fut_eps = 0.025,
+  alpha = list(qlogis(cumsum(c(16, 28, 32, 12, 2, 2, 2, 6) / 100)[1:7])),
   eta = list(rep(0, 3),
              c(0, 0, log(1.1)),
              c(0, 0, log(1.2))),
   sorted = FALSE
 )
 
+
 # ----- Which configurations do we want to run? -----
 run_row <- seq_len(nrow(cfg))
 
-# ----- Loop over configurations and save results -----
 
+# ----- Loop over configurations and save results -----
+pboptions(type = "txt")
 for(z in run_row) {
   start_time <- Sys.time()
 
-  res <- mclapply(1:cfg[z][["sims"]], function(j) {
+  res <- pblapply(1:cfg[z][["sims"]], function(j) {
     sim_clarity2_ppos_trial(
       mod,
       n_seq = cfg[z][["n_seq"]][[1]],
       eff_eps = cfg[z][["eff_eps"]][[1]],
       fut_eps = cfg[z][["fut_eps"]][[1]],
+      alpha = cfg[z][["alpha"]][[1]],
       eta = cfg[z][["eta"]][[1]],
       refresh = 0)
   }, mc.cores = num_cores)
@@ -84,6 +92,6 @@ for(z in run_row) {
     trial = resl_trial,
     yobs = resl_yobs,
     runtime = end_time - start_time),
-    paste0("~/out_files/clarity2_sims/ppos_",
+    paste0("~/out_files/clarity2_sims/new_ppos_",
            formatC(z, width = 2, flag = "0"), ".rds"))
 }

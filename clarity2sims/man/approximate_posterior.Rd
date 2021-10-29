@@ -4,12 +4,16 @@
 \alias{approximate_posterior}
 \title{approximate_posterior}
 \usage{
-approximate_posterior(mod, moddat)
+approximate_posterior(mod, moddat, collapse_levels = TRUE)
 }
 \arguments{
 \item{mod}{Stan model}
 
 \item{moddat}{Model data}
+
+\item{collapse_levels}{Optimisation likely to fail if any outcome levels have zero observations.
+If this parameter is TRUE (default) then drops outcome levels with zero observations and shares
+the prior weight equally across all remaining levels}
 }
 \value{
 A list with posterior mean and covariance
