@@ -3,7 +3,7 @@
 \name{compile_rstan_mod}
 \alias{compile_rstan_mod}
 \title{compile_rstan_mod
-Compile provided cumulative logistic Stan model for rstan}
+Compile provided cumulative logistic Stan model for rstan.}
 \usage{
 compile_rstan_mod()
 }
@@ -12,5 +12,5 @@ A \code{stanmodel} object
 }
 \description{
 compile_rstan_mod
-Compile provided cumulative logistic Stan model for rstan
+Compile provided cumulative logistic Stan model for rstan.
 }
