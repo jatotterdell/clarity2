@@ -28,7 +28,7 @@ impute_data <- function(npred, post_p) {
 #' @return A list with posterior mean and covariance
 approximate_posterior <- function(mod, moddat, collapse_levels = TRUE) {
   level_totals <- colSums(moddat$y)
-  if(collapse_levels & any(level_totals) == 0) {
+  if(collapse_levels & any(level_totals == 0)) {
     moddat$y <- moddat$y[, level_totals != 0]
     moddat$K <- sum(level_totals != 0)
     moddat$prior_counts <- moddat$prior_counts[level_totals != 0] * sum(moddat$prior_counts) / sum(moddat$prior_counts[level_totals != 0])
@@ -72,7 +72,7 @@ calc_ppos <- function(mod, dat, yimp, epsilon = 0.975, n_draws = 0) {
     fit <- approximate_posterior(mod, dat)
     M <- fit$M
     V <- fit$V
-    if (is.na(V)) {
+    if (any(is.na(V))) {
       pr_clt0[b, ] <- NA
     } else {
       CM <- drop(Cmat %*% M)
@@ -127,7 +127,7 @@ assess_futility <- function(mod, moddat, n, p, n_max, n_sim = 1, B = 500) {
 #' @title sim_clarity2_ppos_trial
 #' @description Simulate Clarity 2 with futility check
 #' @details Note, assume the model is reverse coded, so OR > 1 => Pr(y < k) increases.
-#' @param mod A list including the stan model as first element, and standata as second
+#' @param mod A list including the stan model as first element, and standata as second, and approximation stan model as third element
 #' @param n_seq Sequence of interim analysis sample sizes
 #' @param p_assign Assignment probabilities
 #' @param alpha Intercept parameter
@@ -149,6 +149,7 @@ sim_clarity2_ppos_trial <- function(
   fut_eps = 0.02,
   B_ppos = 500,
   ...) {
+
   N <- length(p_assign)
   K <- length(alpha) + 1
   X <- rbind(0, diag(1, N - 1))
@@ -195,7 +196,7 @@ sim_clarity2_ppos_trial <- function(
       P <- aperm(array(c(post_p), dim = list(nrow(post_p), nrow(p), ncol(p))), c(2, 3, 1))
       x_imp <- table(factor(permuted_block_rand(p_assign, n_left[i], 2 * N)[["trt"]], levels = seq_len(N)))
       y_imp <- impute_data(x_imp, P[, , sample.int(dim(P)[3], size = B_ppos)])
-      ppos[i, ] <- matrixStats::colMeans2(calc_ppos(mod[[1]], mod[[2]], y_imp, n_draws = 0) > eff_eps)
+      ppos[i, ] <- matrixStats::colMeans2(calc_ppos(mod[[3]], mod[[2]], y_imp, n_draws = 0) > eff_eps)
     } else {
       ppos[i, ] <- NA
     }

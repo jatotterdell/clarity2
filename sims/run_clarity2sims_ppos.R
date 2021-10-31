@@ -13,7 +13,7 @@ library(optparse)
 option_list = list(
   make_option(c("-c", "--cores"), type="integer", default=14,
               help="number of cores to use", metavar="character"),
-  make_option(c("-n", "--nsim"), type="integer", default=1000,
+  make_option(c("-n", "--nsim"), type="integer", default=200,
               help="number of simulations to run under each configuration", metavar="character")
 );
 opt <- parse_args(OptionParser(option_list = option_list))
@@ -32,7 +32,8 @@ ordmodat <- list(
   prior_counts = 2*rep(1/8, 8),
   prior_sd = rep(1, 2)
 )
-mod <- list(ordmod, ordmodat)
+approxmod <- clarity2sims:::compile_rstan_approx_mod()
+mod <- list(ordmod, ordmodat, approxmod)
 
 
 # ----- PRNGs -----
@@ -72,7 +73,7 @@ for(z in run_row) {
       alpha = cfg[z][["alpha"]][[1]],
       eta = cfg[z][["eta"]][[1]],
       refresh = 0)
-  }, mc.cores = num_cores)
+  }, cl = num_cores)
 
   resl_alpha <- rbindlist(lapply(res, \(x) x[["alpha"]]), idcol = "trial")
   resl_contr <- rbindlist(lapply(res, \(x) x[["contr"]]), idcol = "trial")
