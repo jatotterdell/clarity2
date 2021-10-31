@@ -159,7 +159,7 @@ ordinal_probs_mats <- function(alpha, eta) {
 
 
 #' @title compile_rstan_mod
-#' Compile provided cumulative logistic Stan model for rstan
+#' Compile provided cumulative logistic Stan model for rstan.
 #'
 #' @return A `stanmodel` object
 #' @importFrom rstan stan_model
@@ -168,8 +168,18 @@ compile_rstan_mod <- function() {
 }
 
 
+#' @title compile_rstan_mod
+#' Compile provided cumulative logistic Stan model using alternative parameterisation for rstan.
+#'
+#' @return A `stanmodel` object
+#' @importFrom rstan stan_model
+compile_rstan_approx_mod <- function() {
+  rstan::stan_model(file = system.file("stan", "cumulative_logistic_agg_rev_altpar.stan", package = "clarity2sims"))
+}
+
+
 #' @title compile_cmdstanr_mod
-#' Compile provided cumulative logistic Stan model for rstan
+#' Compile provided cumulative logistic Stan model for cmdstanr.
 #'
 #' @return A `CmdStanModel` object
 #' @importFrom cmdstanr cmdstan_model
