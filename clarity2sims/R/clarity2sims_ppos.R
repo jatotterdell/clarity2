@@ -62,11 +62,13 @@ approximate_posterior <- function(mod, moddat, collapse_levels = TRUE) {
 #' @param epsilon Threshold for deciding superiority at maximum sample size
 #' @param n_draws Number of posterior draws to use in calculating PPoS
 #' @importFrom rstan optimizing
-calc_ppos <- function(mod, dat, yimp, epsilon = 0.975, n_draws = 0) {
+calc_ppos <- function(mod, dat, yimp, delta = 0, n_draws = 0) {
   B <- dim(yimp)[3]
   yobs <- dat$y
   pr_clt0 <- matrix(0, B, 3)
-  Cmat <- rbind(c(0, 1), c(-1, 1))  # Or whatever contrast
+  # Cmat <- rbind(c(0, 1), c(-1, 1))  # Or whatever contrast
+  Cmat <- dat$C
+  Xmat <- dat$X
   for (b in 1:B) {
     dat$y <- yobs + yimp[, , b]
     fit <- approximate_posterior(mod, dat)
@@ -75,10 +77,10 @@ calc_ppos <- function(mod, dat, yimp, epsilon = 0.975, n_draws = 0) {
     if (any(is.na(V))) {
       pr_clt0[b, ] <- NA
     } else {
-      CM <- drop(Cmat %*% M)
-      CVCt <- Cmat %*% V %*% t(Cmat)
-      pr_clt0[b, -3] <- 1 - stats::pnorm(0, CM, sqrt(diag(CVCt)))
-      pr_clt0[b, 3] <- mvtnorm::pmvnorm(lower = 0, mean = CM, sigma = CVCt)
+      CXM <- drop(Cmat %*% (Xmat[-1, ] %*% M))
+      CXVXtCt <- Cmat %*% (Xmat[-1, ] %*% V %*% t(Xmat[-1, ])) %*% t(Cmat)
+      pr_clt0[b, -3] <- 1 - stats::pnorm(delta, CXM, sqrt(diag(CXVXtCt)))
+      pr_clt0[b, 3] <- mvtnorm::pmvnorm(lower = delta, mean = CXM, sigma = CXVXtCt)
     }
   }
   return (pr_clt0)
@@ -135,6 +137,9 @@ assess_futility <- function(mod, moddat, n, p, n_max, n_sim = 1, B = 500) {
 #' @param eff_eps Effectiveness threshold
 #' @param fut_eps Futility threshold
 #' @param B_ppos Number of draws to use for calculating PPoS
+#' @param stage2 Which arms to take into Stage 2? "all" takes both controls, "first" always takes control 1
+#' and "best" always takes the one with highest posterior mean log-odds.
+#' We can equate "first" to a random choice if both controls are equivalent.
 #' @param ... Additional arguments to rstan::sampling
 #' @return A list
 #' @importFrom rstan sampling
@@ -144,15 +149,17 @@ sim_clarity2_ppos_trial <- function(
   n_seq = seq(600, 2100, 300),
   p_assign = rep(1 / 3, 3),
   alpha = stats::qlogis(cumsum(c(16, 28, 32, 12, 2, 2, 2, 6) / 100)[1:7]),
-  eta = c(0, -0.5, 0.5),
+  eta = c(0, 0, 0),
   eff_eps = 0.975,
   fut_eps = 0.02,
   B_ppos = 500,
+  stage2 = "all",
   ...) {
 
   N <- length(p_assign)
   K <- length(alpha) + 1
-  X <- rbind(0, diag(1, N - 1))
+  X <- mod[[2]]$X
+  C <- mod[[2]]$C
   n_max <- max(n_seq)
   n_new <- diff(c(0, n_seq))
   n_int <- length(n_seq)
@@ -163,14 +170,13 @@ sim_clarity2_ppos_trial <- function(
   labs <- list("analysis" = 1:n_int, "variable" = 1:3)
   n_obs <- matrix(0, n_int, N, dimnames = labs)
   e_alpha <- matrix(0, n_int, K - 1, dimnames = list("analysis" = 1:n_int, "variable" = 1:(K - 1)))
-  v_alpha <- e_alpha
+  lo_alpha <- hi_alpha <- v_alpha <- e_alpha
   e_beta <- matrix(0, n_int, N - 1, dimnames = list("analysis" = 1:n_int, "variable" = 2:3))
-  v_beta <- matrix(0, n_int, N - 1, dimnames = list("analysis" = 1:n_int, "variable" = 2:3))
-  pr_eff <- matrix(0, n_int, N - 1, dimnames = list("analysis" = 1:n_int, "variable" = 2:3))
+  v_eta <- e_eta <- lo_eta <- hi_eta <- v_beta <- e_beta
   pr_ctr <- matrix(0, n_int, 3, dimnames = list("analysis" = 1:n_int, "contrast" = c("3v1", "3v2", "3v1and2")))
+  e_ctr <- pr_ctr
   ppos <- matrix(0, n_int, 3, dimnames = list("analysis" = 1:n_int, "contrast" = c("3v1", "3v2", "3v1and2")))
   i_ctr <- pr_ctr
-  i_eff <- pr_eff
   i_ppos <- ppos
   y <- matrix(0, N, K)
   y_obs <- array(0,
@@ -180,6 +186,16 @@ sim_clarity2_ppos_trial <- function(
                                  "level" = seq_len(K)))
 
   for (i in 1:n_int) {
+    # After stage 1, if not "all" then drop one of the control arms
+    if (i == 2 & stage2 != "all") {
+      if (stage2 == "first") {
+        p_assign <- c(0.5, 0, 0.5)
+      } else if (stage2 == "best" & e_beta[i - 1, 1] > 0) {
+        p_assign <- c(0, 0.5, 0.5)
+      } else {
+        p_assign <- c(0.5, 0, 0.5)
+      }
+    }
     # Treatment assignment
     x_new <- permuted_block_rand(p_assign, n_new[i], 2 * N)[["trt"]]
     n_x <- table(factor(x_new, levels = seq_len(length(p_assign))))
@@ -190,8 +206,9 @@ sim_clarity2_ppos_trial <- function(
     fit <- rstan::sampling(mod[[1]], data = mod[[2]], refresh = 0, chains = 4, iter = 3000, warmup = 500, ...)
     post_draws <- as_draws_matrix(fit)
     post_p <- post_draws[, grepl("p\\[", colnames(post_draws))]
-    post_alpha <- post_draws[, grepl("alpha", colnames(post_draws))]
-    post_beta <- post_draws[, grepl("beta\\[", colnames(post_draws))]
+    post_alpha <- post_draws[, grepl("^alpha", colnames(post_draws))]
+    post_beta <- post_draws[, grepl("^beta\\[", colnames(post_draws))]
+    post_eta <- post_draws[, grepl("^eta\\[[2-3]", colnames(post_draws))]
     if (i < n_int) {
       P <- aperm(array(c(post_p), dim = list(nrow(post_p), nrow(p), ncol(p))), c(2, 3, 1))
       x_imp <- table(factor(permuted_block_rand(p_assign, n_left[i], 2 * N)[["trt"]], levels = seq_len(N)))
@@ -203,15 +220,20 @@ sim_clarity2_ppos_trial <- function(
     n_obs[i, ] <- rowSums(y)
     e_alpha[i, ] <- matrixStats::colMeans2(post_alpha)
     v_alpha[i, ] <- diag(var(post_alpha))
+    tmp <- HDInterval::hdi(post_alpha)
+    lo_alpha[i, ] <- tmp[1, ]
+    hi_alpha[i, ] <- tmp[2, ]
     e_beta[i, ] <- matrixStats::colMeans2(post_beta)
     v_beta[i, ] <- diag(var(post_beta))
-    # is arm 2,3 better than arm 1?
-    pr_eff[i, ] <- matrixStats::colMeans2(post_beta > 0)
+    e_eta[i, ] <- matrixStats::colMeans2(post_eta)
+    v_eta[i, ] <- diag(var(post_eta))
+    tmp <- HDInterval::hdi(post_eta)
+    lo_eta[i, ] <- tmp[1, ]
+    hi_eta[i, ] <- tmp[2, ]
     # is arm 3 better than arm 2, and arm 1 and 2?
-    pr_ctr[i, ] <- c(pr_eff[i, 2],
-                     matrixStats::colMeans2(post_beta[, 2] - post_beta[, 1] > 0),
-                     matrixStats::colMeans2(post_beta[, 2] > 0 & post_beta[, 2] - post_beta[, 1] > 0))
-    i_eff[i, ] <- as.integer(pr_eff[i, ] > eff_eps)
+    pr_ctr[i, ] <- c(matrixStats::colMeans2(post_eta[, 2] > 0),
+                     matrixStats::colMeans2(post_eta[, 2] - post_eta[, 1] > 0),
+                     matrixStats::colMeans2(post_eta[, 2] > 0 & post_eta[, 2] - post_eta[, 1] > 0))
     i_ctr[i, ] <- as.integer(pr_ctr[i, ] > eff_eps)
     i_ppos[i, ] <- as.integer(ppos[i, ] < fut_eps)
     # if (i < n_int && i_ppos[i, 1] == 1) break
@@ -221,21 +243,23 @@ sim_clarity2_ppos_trial <- function(
   # Summarise outputs by relevant groupings
   out_alpha <- list(
     e_alpha = e_alpha[ind, , drop = F],
-    v_alpha = v_alpha[ind, , drop = F]
+    v_alpha = v_alpha[ind, , drop = F],
+    lo_alpha = lo_alpha[ind, , drop = F],
+    hi_alpha = hi_alpha[ind, , drop = F]
   )
-
   out_arm <- list(
     n_obs = n_obs[ind, , drop = F],
     e_beta = e_beta[ind, , drop = F],
     v_beta = v_beta[ind, , drop = F],
-    pr_eff = pr_eff[ind, , drop = F]
+    e_eta = e_eta[ind, , drop = F],
+    v_eta = v_eta[ind, , drop = F],
+    lo_eta = lo_eta[ind, , drop = F],
+    hi_eta = hi_eta[ind, , drop = F]
   )
-
   out_ctr <- list(
     pr_ctr = pr_ctr[ind, , drop = F],
     ppos   = ppos[ind, , drop = F]
   )
-
   y_obs <- y_obs[ind, , , drop = FALSE]
 
   return (list(

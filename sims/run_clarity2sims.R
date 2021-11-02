@@ -21,8 +21,10 @@ num_sims  <- opt$nsim
 
 #  ----- Compile the required model -----
 ordmod <- clarity2sims:::compile_cmdstanr_mod()
-ordmoddat <- list(N = 3, P = 2, K = 8, X = rbind(0, c(1, 0), c(0, 1)),
-                  prior_counts = rep(2 / 8, 8), prior_sd = rep(1, 2))
+ordmoddat <- list(N = 3, P = 2, K = 8,
+                  X = rbind(0, c(1, 0), c(1, 1)),
+                  prior_counts = rep(2 / 8, 8),
+                  prior_sd = rep(1, 2))
 mod <- list(ordmod, ordmoddat)
 
 #  ----- Randomisation -----
@@ -46,18 +48,17 @@ cfg <- CJ(
 run_row <- seq_len(nrow(cfg))
 
 # ----- Loop over configurations and save results -----
-pboptions(type = "txt")
 for (z in run_row) {
   start_time <- Sys.time()
 
-  res <- pblapply(1:cfg[z][["sims"]], function(j) {
+  res <- mclapply(1:cfg[z][["sims"]], function(j) {
     sim_clarity2_trial(
       mod,
       n_seq = unlist(cfg[z][["n_seq"]]),
       eff_eps = cfg[z][["eff_eps"]][[1]],
       eta = cfg[z][["eta"]][[1]],
       refresh = 0)
-  }, cl = num_cores)
+  }, mc.cores = num_cores)
 
   resl_alpha <- rbindlist(lapply(res, \(x) x[["alpha"]]), idcol = "trial")
   resl_trial <- rbindlist(lapply(res, \(x) x[["trial"]]), idcol = "trial")

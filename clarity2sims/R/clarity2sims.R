@@ -24,6 +24,11 @@ update_model <- function(mod, moddat, ...) {
 #' @param alpha True intercept parameter
 #' @param eta True eta parameter
 #' @param eff_eps Effectiveness threshold
+#' @param stage2 Which arms to take into Stage 2? "all" takes both controls, "first" always takes control 1
+#' and "best" always takes the one with highest posterior mean log-odds.
+#' We can equate "first" to a random choice if both controls are equivalent.
+#' @param drop_arms If drop_arms is TRUE, then a control arm may be dropped and the trial continues.
+#' A single control will be dropped if the investigational arm is found effective relative to it.
 #' @param ... Other arguments to cmdstanr::sample, e.g. adapt_delta, chains, etc.
 #' @return A list of trial related data.tables
 #' @export
@@ -33,6 +38,8 @@ sim_clarity2_trial <- function(mod,
                                alpha = stats::qlogis(cumsum(c(16, 29, 32, 13, 2, 1, 1, 6) / 100)[1:7]),
                                eta = c(0, -0.5, 0.5),
                                eff_eps = 0.975,
+                               stage2 = "all",
+                               drop_arms = FALSE,
                                ...) {
   N <- length(p_assign)
   K <- length(alpha) + 1
@@ -40,6 +47,9 @@ sim_clarity2_trial <- function(mod,
   n_new <- diff(c(0, n_seq))
   n_int <- length(n_seq)
   y <- matrix(0, N, K)
+
+  # Contrast matrix
+  C <- rbind(c(1, 1), c(0, 1))
 
   # Storage
   labs <- list(c("analysis" = 1:n_int), c("arm" = 1:3))
@@ -53,6 +63,16 @@ sim_clarity2_trial <- function(mod,
   i_eff2 <- pr_eff2
 
   for (i in 1:n_int) {
+    # After stage 1, if not "all" then drop one of the control arms
+    if (i == 2 & stage2 != "all") {
+      if (stage2 == "first") {
+        p_assign <- c(0.5, 0, 0.5)
+      } else if (stage2 == "best" & e_beta[i - 1, 1] > 0) {
+        p_assign <- c(0, 0.5, 0.5)
+      } else {
+        p_assign <- c(0.5, 0, 0.5)
+      }
+    }
     # Treatment assignment
     x_new <- permuted_block_rand(p_assign, n_new[i], 2 * N)[["trt"]]
     n_x <- table(factor(x_new, levels = seq_len(length(p_assign))))
@@ -70,6 +90,10 @@ sim_clarity2_trial <- function(mod,
     # is arm 3 better than arm 1 and 2?
     pr_eff2[i, ] <- posterior::Pr(fit$beta[2] > 0 & fit$beta[2] - fit$beta[1] > 0)
     i_eff2[i, ] <- as.integer(pr_eff2[i, ] > eff_eps)
+
+    if (drop_arms) {
+
+    }
 
     if (i_eff2[i, ] == 1) break
   }
@@ -91,8 +115,14 @@ sim_clarity2_trial <- function(mod,
     i_eff2 = i_eff2[ind, , drop = F]
   )
 
+  out_ctr <- list(
+    pr_ctr = pr_ctr[ind, , drop = F],
+    ppos   = ppos[ind, , drop = F]
+  )
+
   return(list(
     alpha = list_as_dt(out_alpha),
-    trial = list_as_dt(out_arm)
+    trial = list_as_dt(out_arm),
+    contr = list_as_dt(out_ctr)
   ))
 }
