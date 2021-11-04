@@ -96,19 +96,15 @@ The aim of CLARITY 2.0 is to evaluate the safety and efficacy of dual treatment 
 
 The primary objective is to evaluate the safety and efficacy of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease, assessed by clinical Health Score at day 14.
 
-The clinical health score is a 8 (or still 7?) point ordinal scale:
-
-1.  Not hospitalised, no limitations on activities.
-...
-7. Death.
+The clinical health score is a 8 (or still 7?) point ordinal scale (1) best and (8) worst.
 
 ## Interventions
 
 Participants will be randomised into three treatment arms:
 
-1. Candesartan + repagermanium, (Investigational Arm)
-2. Candesartan + placebo [repagermanium], (Control Arm #1)
-3. Placebo [candesartan] + placebo [repagermanium] (Control Arm #2)
+1. Placebo [candesartan] + placebo [repagermanium] (P+P) (Control Arm #2)
+2. Candesartan + placebo [repagermanium] (C+P), (Control Arm #1)
+3. Candesartan + repagermanium (C+R), (Investigational Arm)
 
 ## Randomisation
 
@@ -117,22 +113,15 @@ Initially, treatment allocation will be with a 1:1:1 block randomisation between
 ## Sample Size
 
 Stage 1 - up to 600 participants in India only, following which one control group could potentially be dropped
-Stage 2 - up to 1,500 additional participants between 3 or 2 arms (do we want this total sample size to be calculated on the basis of the stage 1 data?, i.e. use the posterior from stage 1 data to decide planned sample size for stage 2, or just stick with 1,500?).
-
+Stage 2 - up to 1,500 additional participants between 3 or 2 arms.
 Total sample size may therefore be up to 2,100 participants.
 
 After stage 1, interim analyses will be conducted every 300 participants with follow-up where effectiveness will be assessed.
-If results appear futile then the trial may stop early for lack of effectiveness.
 
 ## Statistical Analysis
 
 A cumulative logistic regression model will be used to assess the effectiveness of the investigational arm compared to each control arm (or the single control arm).
 The investigational arm will be compared to each control arm, and effectiveness assessed in terms of the common odds ratio of being in a better clinical health status at day 14.
-A 95\% credible interval and the posterior probability that the common odds ratio is less than zero will be reported.
-
-## Decision Rules
-
-The trial will only stop for effectiveness if the investigational arm is found superior to either the single (two arm), or both continuing control arms (three arm).
 
 \clearpage
 
@@ -301,7 +290,7 @@ If any of the outcome levels have zero observations across all treatment groups,
 
 ## Decision Rules
 
-In terms of the above model, we consider two possible decision processes.
+In terms of the above model, we consider two possible decision processes in the simulations.
 
 ### Effectiveness
 
@@ -313,22 +302,22 @@ Effectiveness of the intervention against each control group is assessed by (con
 \mathbb{P}(\beta_3 + \beta_2 > 0,\beta_3 > \delta | \texttt{data}_n) &\quad \text{(C+R > P+P and C+P)}. (\#eq:eff3)
 \end{align}
 
-If both probabilities \@ref(eq:eff1) and \@ref(eq:eff2) exceed some threshold, $\epsilon_\text{eff}$ then a decision of effectiveness relative to each control is recommended, and the trial may stop early.
-If either probability \@ref(eq:eff1) or \@ref(eq:eff2) falls below some threshold, $\epsilon_\text{hrm}$, then a decision of harmfulness relative to at least one control is recommended, and the trial may stop early.
+If both probabilities \@ref(eq:eff1) and \@ref(eq:eff2) exceed some threshold, $\epsilon_\text{eff}$, at an analysis then a decision of effectiveness relative to each control is recommended.
+If either probability \@ref(eq:eff1) or \@ref(eq:eff2) falls below some threshold, $\epsilon_\text{hrm}$, then a decision of harmfulness relative to at least one control is recommended.
 The simulations specify $\delta=0$.
 
-Alternatively, decision could use the joint assessment \@ref(eq:eff3).
+Alternatively, decision could use the joint event \@ref(eq:eff3).
 
 ### Trial Futility
 
-Alternatively, futility of the trial itself may be monitored according to the predicted probability of deciding effectiveness at the maximum sample size (assuming this can not be increased) conditional on data from $n$ participants assuming an additional $m$ participants will be recruited
+Futility of the trial itself may be monitored according to the predicted probability of an effectiveness decision at the maximum sample size conditional on data from $n$ participants assuming an additional $m$ participants will be recruited
 \begin{align}
 \text{PPoS}_{\text{P+P}}(\texttt{data}_n, m) &= \mathbb{E}[\mathbb{P}(\beta_3 + \beta_2 > \delta | \texttt{data}_{n+m}) | \texttt{data}_n]  (\#eq:fut1) \\
 \text{PPoS}_{\text{C+P}}(\texttt{data}_n, m) &= \mathbb{E}[\mathbb{P}(\beta_3 > \delta | \texttt{data}_{n+m}) | \texttt{data}_n]  (\#eq:fut2) \\
 \text{PPoS}_{\text{P+P,C+P}}(\texttt{data}_n, m) &= \mathbb{E}[\mathbb{P}(\beta_3 + \beta_2 > \delta,\beta_3>0 | \texttt{data}_{n+m}) | \texttt{data}_n]  (\#eq:fut3) 
 \end{align}
 
-In practice, calculation of these quantities requires assumptions about the future distribution of covariates included in the model.
+In practice, calculation of these predictive quantities requires assumptions about the future distribution of covariates included in the model.
 In the simulations, the only covariate is assigned treatment which is assumed to be assigned 1:1:1 up to the maximum sample size.
 
 ## Scenarios
