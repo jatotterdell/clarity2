@@ -1,0 +1,688 @@
+---
+title: "CLARITY 2.0 Simulations"
+author: "James Totterdell and Michael Dymock"
+date: "`r Sys.Date()`"
+output: 
+  bookdown::pdf_document2:
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{blkarray}
+  - \usepackage{amsmath}
+  - \usepackage{fontspec}
+  - \usepackage{setspace}
+  - \renewcommand{\familydefault}{\sfdefault}
+  - \onehalfspace
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	fig.align = "center",
+	fig.height = 3,
+	fig.width = 4,
+	message = FALSE,
+	warning = FALSE
+)
+out_dir <- "~/out_files/clarity2_sims/"
+```
+
+
+```{r pkgs, eval=TRUE}
+library(Hmisc)
+library(data.table)
+library(ggplot2)
+library(kableExtra)
+
+theme_set(theme_bw(base_size = 10) +
+            theme(panel.grid.minor = element_blank()))
+```
+
+
+```{r funs}
+mean_quantile <- function (x) {
+    x <- stats::na.omit(x)
+    quant <- quantile(x, c(0.25, 0.75))
+    mean <- mean(x)
+    ggplot2:::new_data_frame(list(y = mean, ymin = quant[1], ymax = quant[2]), n = 1)
+}
+median_quantile <- function (x) {
+    x <- stats::na.omit(x)
+    quant <- quantile(x, c(0.25, 0.5, 0.75))
+    ggplot2:::new_data_frame(list(y = quant[2], ymin = quant[1], ymax = quant[3]), n = 1)
+}
+
+# Uses the eps_eff as simulated for calculating PPoS,
+# but applies arbitrary futility bound
+decide_futility <- function(trial_dat, eps_fut = 0.025) {
+  # Identify when we stop
+  stop <- trial_dat[trial_dat[, 
+  .I[(ppos_3v1 < eps_fut | ppos_3v2 < eps_fut) |
+     ((pr_ctr_3v1 > eff_eps) & (pr_ctr_3v2 > eff_eps)) | 
+      analysis == max(analysis)][1], 
+  keyby = .(configuration, eff_eps, OR, trial)]$V1]
+  stop[, `:=`(
+    result = fcase(
+      (ppos_3v1 < eps_fut | ppos_3v2 < eps_fut) & analysis < max(analysis), "futile",
+      (pr_ctr_3v1 > eff_eps) & (pr_ctr_3v2 > eff_eps), "effective",
+      default = "no result"
+    )
+  )]
+  end <- stop[, .(configuration, trial, start = 1, end = analysis, result)]
+  ppos_stop <- end[trial_dat, on = c("configuration", "trial")]
+  ppos_stop[, status := fcase(
+    analysis < end, "no result",
+    analysis >= end, result
+  )]
+  ppos_stop_status <- ppos_stop[, .N, keyby = .(configuration, analysis, status)]
+  ppos_stop_status[, P := N / sum(N), by = .(configuration, analysis)]
+  ppos_stop_status <- ppos_stop_status[
+    CJ(configuration = configuration, analysis = analysis, status = status, unique = TRUE), 
+    on = .(configuration, analysis, status)]
+  ppos_stop_status[is.na(ppos_stop_status)] <- 0
+  return(list(ppos_stop_status = ppos_stop_status, stop = stop))
+}
+```
+
+
+\clearpage
+
+# Background
+
+## Aim
+
+The aim of CLARITY 2.0 is to evaluate the safety and efficacy of dual treatment with repagermanium and candesartan compared to placebo for patients hospitalised for management of COVID-19.
+
+## Objectives
+
+The primary objective is to evaluate the safety and efficacy of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease, assessed by clinical Health Score at day 14.
+
+The clinical health score is a 8 (or still 7?) point ordinal scale:
+
+1.  Not hospitalised, no limitations on activities.
+...
+7. Death.
+
+## Interventions
+
+Participants will be randomised into three treatment arms:
+
+1. Candesartan + repagermanium, (Investigational Arm)
+2. Candesartan + placebo [repagermanium], (Control Arm #1)
+3. Placebo [candesartan] + placebo [repagermanium] (Control Arm #2)
+
+## Randomisation
+
+Initially, treatment allocation will be with a 1:1:1 block randomisation between the three arms, stratified by centre.
+
+## Sample Size
+
+Stage 1 - up to 600 participants in India only, following which one control group could potentially be dropped
+Stage 2 - up to 1,500 additional participants between 3 or 2 arms (do we want this total sample size to be calculated on the basis of the stage 1 data?, i.e. use the posterior from stage 1 data to decide planned sample size for stage 2, or just stick with 1,500?).
+
+Total sample size may therefore be up to 2,100 participants.
+
+After stage 1, interim analyses will be conducted every 300 participants with follow-up where effectiveness will be assessed.
+If results appear futile then the trial may stop early for lack of effectiveness.
+
+## Statistical Analysis
+
+A cumulative logistic regression model will be used to assess the effectiveness of the investigational arm compared to each control arm (or the single control arm).
+The investigational arm will be compared to each control arm, and effectiveness assessed in terms of the common odds ratio of being in a better clinical health status at day 14.
+A 95\% credible interval and the posterior probability that the common odds ratio is less than zero will be reported.
+
+## Decision Rules
+
+The trial will only stop for effectiveness if the investigational arm is found superior to either the single (two arm), or both continuing control arms (three arm).
+
+\clearpage
+
+# Approximate Power
+
+As an indication, consider two arms with 1:1 assignment and a sample size of 200 per arm (Stage 1).
+Assume that there is no missingness and no drop-out.
+
+The power function of an approximate test of equality with $\alpha=0.05$ is given in Figure \@ref(fig:freq-power-two) assuming that the distribution of the levels of the outcome in the control group is (0.16, 0.29, 0.32, 0.13, 0.02, 0.01, 0.01, 0.06).
+
+```{r freq-power-two, fig.cap="Two arm with 200 per arm.", echo = FALSE, eval=TRUE, include=TRUE}
+# Baseline distribution
+p0 <- c(16, 29, 32, 13, 2, 1, 1, 6) / 100
+# Log odds ratios
+log_or <- seq(log(0.25), log(4), length.out = 1e4)
+# Approximate power
+power1 <- sapply(log_or, function(x) popower(p = p0, exp(x), n = 400)$pow)
+par(cex = 0.75)
+plot(exp(log_or), power1, type = 'l', log = "x",
+     xlim = c(1/2, 2),
+     ylim = c(0, 1),
+     xaxt = "n",
+     xlab = "Odds ratio (log scale)",
+     ylab = "Power (equality)",
+     bty = "n")
+axis(side = 1, 
+     at = c(1/2, 1/1.5, 1/1.25, 1, 1.25, 1.5, 2),
+     labels = sprintf("%.2f", c(1/2, 1/1.5, 1/1.25, 1, 1.25, 1.5, 2)))
+abline(h = 0.9, lty = 2)
+```
+
+Figure \@ref(fig:freq-power-two-2) presents the same, but assuming 700 participants per arm (i.e Phase III continues with three arms up to 2,100 inclusive of Phase II).
+
+```{r freq-power-two-2, fig.cap = "Two arm with 700 per arm.", echo = FALSE, eval=TRUE, include=TRUE}
+# Approximate power
+power2 <- sapply(log_or, function(x) popower(p = p0, exp(x), n = 1400)$pow)
+par(cex = 0.75)
+plot(exp(log_or), power2, type = 'l', log = "x",
+     xlim = c(1/1.5, 1.5),
+     ylim = c(0, 1),
+     xaxt = "n",
+     xlab = "Odds ratio (log scale)",
+     ylab = "Power (equality)",
+     bty = "n")
+axis(side = 1, 
+     at = c(1/1.5, 1/1.25, 1, 1.25, 1.5),
+     labels = sprintf("%.2f", c(1/1.5, 1/1.25, 1, 1.25, 1.5)))
+abline(h = 0.9, lty = 2)
+```
+
+
+```{r freq-power-two-3, fig.cap = "Two arm with 950 per arm.", echo = FALSE, eval=TRUE, include=FALSE}
+# Approximate power
+power3 <- sapply(log_or, function(x) popower(p = p0, exp(x), n = 1900)$pow)
+par(cex = 0.75)
+plot(exp(log_or), power3, type = 'l', log = "x",
+     xlim = c(1/1.5, 1.5),
+     ylim = c(0, 1),
+     xaxt = "n",
+     xlab = "Odds ratio (log scale)",
+     ylab = "Power (equality)",
+     bty = "n")
+axis(side = 1, 
+     at = c(1/1.5, 1/1.25, 1, 1.25, 1.5),
+     labels = sprintf("%.2f", c(1/1.5, 1/1.25, 1, 1.25, 1.5)))
+abline(h = 0.9, lty = 2)
+```
+
+
+```{r freq-power-two-5, fig.cap = "Two arm with 1,050 per arm.", echo = FALSE, eval=TRUE, include=FALSE}
+# Approximate power
+power4 <- sapply(log_or, function(x) popower(p = p0, exp(x), n = 2100)$pow)
+par(cex = 0.75)
+plot(exp(log_or), power4, type = 'l', log = "x",
+     xlim = c(1/1.5, 1.5),
+     ylim = c(0, 1),
+     xaxt = "n",
+     xlab = "Odds ratio (log scale)",
+     ylab = "Power (equality)",
+     bty = "n")
+axis(side = 1, 
+     at = c(1/1.5, 1/1.25, 1, 1.25, 1.5),
+     labels = sprintf("%.2f", c(1/1.5, 1/1.25, 1, 1.25, 1.5)))
+abline(h = 0.9, lty = 2)
+```
+
+Figure \@ref(fig:freq-power-two-4) presents power curves under various sample sizes assuming a two-sided size 0.05 test with no missingness.
+
+Two arms with equal assignment of 700 participants each results in power 0.8 for a two-sided test of size $\alpha=0.05$ assuming a common odds ratio of `r sprintf("%.2f", max(exp(log_or)[which(power2 <= 0.8)]))` in the investigational group versus control.
+Two arms with equal assignment of 1,150 participants each results in power 0.8 for a two-sided test of size $\alpha=0.05$ assuming a common odds ratio of `r sprintf("%.2f", max(exp(log_or)[which(power4 <= 0.8)]))` in the investigational group versus control.
+
+```{r freq-power-two-4, fig.height=4, fig.cap="Power for two-arm comparison assuming fixed sample size (per arm as labelled) test  of size $\\alpha=0.05$ for equality.", echo = FALSE, eval=TRUE, include=TRUE}
+par(cex = 0.75)
+plot(exp(log_or), power1, type = 'l', log = "x",
+     xlim = c(1/1.5, 1.5),
+     ylim = c(0, 1),
+     xaxt = "n",
+     xlab = "Odds ratio (log scale)",
+     ylab = "Power (equality)",
+     bty = "n")
+axis(side = 1, 
+     at = c(1/1.5, 1/1.25, 1, 1.25, 1.5),
+     labels = sprintf("%.2f", c(1/1.5, 1/1.25, 1, 1.25, 1.5)))
+lines(exp(log_or), power2, type = 'l', lty = 2)
+lines(exp(log_or), power3, type = 'l', lty = 3)
+lines(exp(log_or), power4, type = 'l', lty = 4)
+abline(h = 0.9, lty = 2)
+legend(x = 0.9, y = 0.8, 
+       legend = rev(c("n = 200", "n = 700", "n = 950", "n = 1050")), 
+       lty = rev(c(1,2,3,4)), bty = "n",
+       cex = 0.9)
+```
+
+\clearpage
+
+# Simulations
+
+## Model
+
+Let $Y_i \in \{1, \dots, 8\}$ be the day 14 clinical health status for participant $i$ where 1 is best and 8 is worst (death). 
+Let $\tau_i \in \{1, 2, 3\}$ denote treatment arm and $x_i$ the corresponding design encoding such that $\eta_\tau=x_\tau^{\mathsf{T}}\beta$ is the shift in the log-odds of each outcome for participant receiving treatment $\tau$. 
+For the (reduced) primary model we specify:
+
+$$
+P(Y_i \leq k|\alpha, \beta, x_i) = \text{logit}^{-1}(\alpha_k + x^T_i\beta) \quad i = 1, 2, ..., k = 1, ..., 8,
+$$
+
+where $\{\alpha_k\}$ is increasing in $k$ and $\beta = (\beta_1, \beta_2)^T$ represent the cumulative log-odds ratio of treatments 2 (candesartan) and 3 (candesartan + repagermanium) relative to control group 1. 
+
+These simulations assume treatment coding according to
+$$
+X = \begin{blockarray}{ccl}
+x_1 & x_2 &  \\
+\begin{block}{(cc)l}
+  0 & 0 & \text{placebo + placebo} \\
+  1 & 0 & \text{candesartan + placebo} \\
+  1 & 1 & \text{candesartan + repagermanium}, \\
+\end{block}
+\end{blockarray}
+$$
+so arm 1 is P+P, arm 2 is C+P and arm 3 is C+R.
+
+Define the outcome level probabilities in the control group by $\pi_k = P[Y = k|\alpha]$, for $k=1,...,8$ where
+
+$$
+\pi_k = \begin{cases}
+1 - \text{logit}^{-1}(\alpha_1) & \text{if }k=1 \\
+\text{logit}^{-1}(\alpha_{k-1}) - \text{logit}^{-1}(\alpha_k) & \text{if }k\in\{2,...,7\}\\
+\text{logit}^{-1}(\alpha_{7}) & \text{if } k=8
+\end{cases}
+$$
+
+We specify the priors on the level probabilities as Dirichlet on the simplex:
+$$
+\pi \sim \text{Dirichlet}(\kappa)
+$$
+for some $\kappa = (\kappa_1,...,\kappa_8)$, ideally informed from prior data where the sum $\sum \kappa_k$ gives the concentration. 
+For the current simulations, $\kappa_k=1/4$ for all $k$.
+
+For the coefficients the current simulations assume the prior
+$$
+\beta_1,\beta_2 \sim \text{Normal}(0, \sigma_\beta=1).
+$$
+
+If any of the outcome levels have zero observations across all treatment groups, then that outcome level is removed from the model for that analysis.
+
+## Decision Rules
+
+In terms of the above model, we consider two possible decision processes.
+
+### Effectiveness
+
+Effectiveness of the intervention against each control group is assessed by (conditional on data from $n$ participants)
+
+\begin{align}
+\mathbb{P}(\beta_3 + \beta_2 > \delta | \texttt{data}_n) &\quad \text{(C+R > P+P)} (\#eq:eff1) \\
+\mathbb{P}(\beta_3 > \delta | \texttt{data}_n) &\quad \text{(C+R > C+P)} (\#eq:eff2) \\
+\mathbb{P}(\beta_3 + \beta_2 > 0,\beta_3 > \delta | \texttt{data}_n) &\quad \text{(C+R > P+P and C+P)}. (\#eq:eff3)
+\end{align}
+
+If both probabilities \@ref(eq:eff1) and \@ref(eq:eff2) exceed some threshold, $\epsilon_\text{eff}$ then a decision of effectiveness relative to each control is recommended, and the trial may stop early.
+If either probability \@ref(eq:eff1) or \@ref(eq:eff2) falls below some threshold, $\epsilon_\text{hrm}$, then a decision of harmfulness relative to at least one control is recommended, and the trial may stop early.
+The simulations specify $\delta=0$.
+
+Alternatively, decision could use the joint assessment \@ref(eq:eff3).
+
+### Trial Futility
+
+Alternatively, futility of the trial itself may be monitored according to the predicted probability of deciding effectiveness at the maximum sample size (assuming this can not be increased) conditional on data from $n$ participants assuming an additional $m$ participants will be recruited
+\begin{align}
+\text{PPoS}_{\text{P+P}}(\texttt{data}_n, m) &= \mathbb{E}[\mathbb{P}(\beta_3 + \beta_2 > \delta | \texttt{data}_{n+m}) | \texttt{data}_n]  (\#eq:fut1) \\
+\text{PPoS}_{\text{C+P}}(\texttt{data}_n, m) &= \mathbb{E}[\mathbb{P}(\beta_3 > \delta | \texttt{data}_{n+m}) | \texttt{data}_n]  (\#eq:fut2) \\
+\text{PPoS}_{\text{P+P,C+P}}(\texttt{data}_n, m) &= \mathbb{E}[\mathbb{P}(\beta_3 + \beta_2 > \delta,\beta_3>0 | \texttt{data}_{n+m}) | \texttt{data}_n]  (\#eq:fut3) 
+\end{align}
+
+In practice, calculation of these quantities requires assumptions about the future distribution of covariates included in the model.
+In the simulations, the only covariate is assigned treatment which is assumed to be assigned 1:1:1 up to the maximum sample size.
+
+## Scenarios
+
+These simulations assess two decision processes:
+
+- interim decisions based on posterior probability of effectiveness and harm only
+- interim decisions based on posterior probability of effectiveness and predictive probability of success (trial futility)
+
+The simulations apply the following decision rules: 
+
+- rule 1 (trial futility):
+  - stop for effectiveness if both \@ref(eq:eff1) and \@ref(eq:eff2) exceed $\epsilon_\text{eff}$
+  - stop for futility if either \@ref(eq:fut1) or \@ref(eq:fut2) fall below $\epsilon_\text{fut}$
+- rule 2 (intervention harm):
+  - stop for effectiveness if both \@ref(eq:eff1) and \@ref(eq:eff2) exceed $\epsilon_\text{eff}$
+  - stop for harm if either \@ref(eq:eff1) or \@ref(eq:eff2) falls below $\epsilon_\text{hrm}$
+
+The simulations investigate scenarios with the following effect sizes (odds ratios) on the investigational arm: (1/1.1, 1.0, 1.1, 1.2, 1.3, 1.5, 2.0).
+All scenarios currently assume equivalence of the two control arms.
+
+Simulations are conducted for a three arm trial.
+In the three arm scenario, the simulations do not currently consider arm dropping.
+All three arms are assigned participants 1:1:1 until the trial stops for effectiveness, harm, futility, or maximum sample size.
+
+## Computational Details
+
+At each interim analysis, posterior draws are generated using HMC via Stan using `rstan::sampling`.
+To calculate PPoS, a sub-sample is used to generate 500 posterior predictive draws as imputed future data, the posteriors approximated via Laplace's method using `rstan::optimizing`, and the required quantities are then derived.
+
+For each posterior probability scenario, 1,000 trial replications are simulated.
+For each PPoS scenario, 500 trial replications are simulated.
+
+\clearpage
+
+# Operating Characteristics
+
+The following figures present:
+
+- the Type I error of each decision rule
+- the power for each decision rule
+- the probability of stopping early for effectiveness, harm, or futility
+
+In summary, 
+
+- type I error is about 0.05 for a decision rule which requires the pariwise odds ratio with each control to be greater than 1 with probability 0.93.
+- under this decision rule, power is greater than 0.89 for an odds ratio for 1.3 over two equivalent control groups and 0.65 for an odds ratio of 1.2 over two equivalent control groups.
+
+## Posterior Probabilities
+
+### Three Arms
+
+```{r}
+post_files <- grep("pprob_", list.files(out_dir), value = TRUE)
+post_res <- lapply(post_files, \(x) readRDS(paste0(out_dir, x)))
+post_cfg <- rbindlist(lapply(post_res, \(x) x[["cfg"]]), idcol = "configuration")
+post_ctr <- rbindlist(lapply(post_res, \(x) x[["contr"]]), idcol = "configuration")
+post_trial <- rbindlist(lapply(post_res, \(x) x[["trial"]]), idcol = "configuration", fill = TRUE)
+post_alpha <- rbindlist(lapply(post_res, \(x) x[["alpha"]]), idcol = "configuration", fill = TRUE)
+
+post_cfg[, OR := sapply(eta, \(x) sprintf("%.2f", exp(x[3])))]
+
+post_ctr <- post_ctr[post_cfg, on = "configuration"]
+post_dec <- post_ctr[, .(configuration, trial, analysis, variable, pr_ctr, OR)]
+post_dec <- dcast(post_dec, configuration + trial + analysis + OR ~ variable, value.var = "pr_ctr")
+```
+
+
+```{r}
+decide_post_trial <- function(tmp, eff_eps, hrm_eps) {
+  stop <- tmp[tmp[, 
+  .I[(`3v1` < hrm_eps | `3v2` < hrm_eps) |
+     (`3v1` > eff_eps & `3v2` > eff_eps) | 
+      analysis == max(analysis)][1], 
+  keyby = .(configuration, OR, trial)]$V1]
+  stop[, `:=`(
+    result = fcase(
+      (`3v1` < hrm_eps | `3v2` < hrm_eps), "harmful",
+      (`3v1` > eff_eps & `3v2` > eff_eps), "effective",
+      analysis == max(analysis), "no result"),
+    eff_eps = eff_eps,
+    hrm_eps = hrm_eps)]
+  end <- stop[, .(configuration, trial, start = 1, end = analysis, result)]
+  stop_all <- end[tmp, on = c("configuration", "trial")]
+  stop_all[, `:=`(
+    status = fcase(
+      analysis < end, "no result",
+      analysis >= end, result),
+    eff_eps = eff_eps,
+    hrm_eps = hrm_eps)]
+  return(list(stop = stop, stop_all = stop_all))
+}
+
+decide_post_trial_joint <- function(tmp, eff_eps, hrm_eps) {
+  stop <- tmp[tmp[, 
+  .I[(`3v1and2` < hrm_eps) |
+     (`3v1and2` > eff_eps) | 
+      analysis == max(analysis)][1], 
+  keyby = .(configuration, OR, trial)]$V1]
+  stop[, `:=`(
+    result = fcase(
+      (`3v1and2` < hrm_eps), "harmful",
+      (`3v1and2` > eff_eps), "effective",
+      analysis == max(analysis), "no result"),
+    eff_eps = eff_eps,
+    hrm_eps = hrm_eps)]
+  end <- stop[, .(configuration, trial, start = 1, end = analysis, result)]
+  stop_all <- end[tmp, on = c("configuration", "trial")]
+  stop_all[, `:=`(
+    status = fcase(
+      analysis < end, "no result",
+      analysis >= end, result),
+    eff_eps = eff_eps,
+    hrm_eps = hrm_eps)]
+  return(list(stop = stop, stop_all = stop_all))
+}
+
+threshold_grid <- expand.grid(eff_eps = seq(0.90, 0.99, by = 0.01),
+                              htm_eps = c(seq(0.01, 0.1, by = 0.01), 0.2))
+res <- lapply(
+  seq_len(nrow(threshold_grid)),
+  \(x) decide_post_trial(
+    post_dec[post_cfg[stage2 == "all", .(configuration)]], threshold_grid[x, 1], threshold_grid[x, 2]))
+stop_res <- rbindlist(lapply(res, \(x) x[[1]]))
+stop_grid <- rbindlist(lapply(res, \(x) x[[2]]))
+stop_grid_fill <- stop_grid[, .N, keyby = .(OR, eff_eps, hrm_eps, analysis, status)][
+  CJ(OR = OR, eff_eps = eff_eps, hrm_eps = hrm_eps, analysis = analysis, status = status, unique = TRUE)
+]
+stop_grid_fill[is.na(stop_grid_fill)] <- 0
+stop_grid_fill[, P := N / sum(N), keyby = .(OR, eff_eps, hrm_eps, analysis)]
+
+res <- lapply(
+  seq_len(nrow(threshold_grid)),
+  \(x) decide_post_trial_joint(
+    post_dec[post_cfg[stage2 == "all", .(configuration)]], threshold_grid[x, 1], threshold_grid[x, 2]))
+stop_grid_joint <- rbindlist(lapply(res, \(x) x[[2]]))
+stop_grid_joint_fill <- stop_grid_joint[, .N, keyby = .(OR, eff_eps, hrm_eps, analysis, status)][
+  CJ(OR = OR, eff_eps = eff_eps, hrm_eps = hrm_eps, analysis = analysis, status = status, unique = TRUE)
+]
+stop_grid_joint_fill[is.na(stop_grid_joint_fill)] <- 0
+stop_grid_joint_fill[, P := N / sum(N), keyby = .(OR, eff_eps, hrm_eps, analysis)]
+```
+
+
+```{r}
+pow <- dcast(
+  stop_grid_fill[status == 'effective' & OR == '1.00' & analysis == 6], 
+  eff_eps ~ hrm_eps, value.var = "P")
+setnames(pow, "eff_eps", "$\\epsilon_{\\text{eff}}$")
+
+add_header_above(kable_styling(
+  kable(pow, booktabs = TRUE, escape = FALSE, linesep = " ", digits = 2,
+        caption = "Type I error for deciding investigational arm effective relative to both controls."),
+  latex_options = "HOLD_position",
+  font_size = 9
+), c(" " = 1, "$\\\\epsilon_{\\\\text{hrm}}$" = 11), escape = FALSE)
+```
+
+
+```{r}
+pow <- dcast(
+  stop_grid_fill[status == 'effective' & hrm_eps == '0.05' & analysis == 6], 
+  OR ~ eff_eps, value.var = "P")
+
+add_header_above(kable_styling(
+  kable(pow, booktabs = TRUE, escape = FALSE, linesep = " ", digits = 2,
+        caption = "Power for deciding investigational arm effective relative to both controls."),
+  latex_options = "HOLD_position",
+  font_size = 9
+), c(" " = 1, "$\\\\epsilon_{\\\\text{eff}}, (\\\\epsilon_{\\\\text{hrm}} = 0.05)$" = 10), escape = FALSE)
+```
+
+
+```{r}
+pow <- dcast(
+  stop_grid_fill[status == 'harmful' & eff_eps == '0.93' & analysis == 6], 
+  OR ~ hrm_eps, value.var = "P")
+
+add_header_above(kable_styling(
+  kable(pow, booktabs = TRUE, escape = FALSE, linesep = " ", digits = 2,
+        caption = "Power for deciding investigational arm harmful relative to at least one control."),
+  latex_options = "HOLD_position",
+  font_size = 9
+), c(" " = 1, "$\\\\epsilon_{\\\\text{hrm}}, (\\\\epsilon_{\\\\text{eff}} = 0.93)$" = 11), escape = FALSE)
+```
+
+
+```{r, fig.cap="Cumulative trial status by analysis, $\\epsilon_{\\text{eff}}=0.93$ and $\\epsilon_{\\text{hrm}}=0.05$.", fig.width=6, fig.height=5}
+ggplot(stop_grid_fill[eff_eps == "0.93" & hrm_eps == "0.05"],
+       aes(analysis, P, fill = status)) +
+  facet_wrap( ~ OR, labeller = label_both) +
+  geom_bar(stat = "identity") +
+  scale_fill_viridis_d() +
+  labs(x = "Analysis", y = "Cumulative proportion of trials", fill = "Trial status") +
+  theme(legend.position = "bottom")
+```
+
+
+\clearpage
+
+## Predictive Probability of Success (PPoS)
+
+```{r}
+ppos_files <- grep("new2_ppos", list.files(out_dir), value = TRUE)
+ppos_res <- lapply(ppos_files, \(x) readRDS(paste0(out_dir, x)))
+ppos_cfg <- rbindlist(lapply(ppos_res, \(x) x[["cfg"]]), idcol = "configuration")
+ppos_ctr <- rbindlist(lapply(ppos_res, \(x) x[["contr"]]), idcol = "configuration")
+ppos_yobs <- rbindlist(lapply(ppos_res, \(x) x[["yobs"]]), idcol = "configuration")
+ppos_trial <- rbindlist(lapply(ppos_res, \(x) x[["trial"]]), idcol = "configuration", fill = TRUE)
+ppos_alpha <- rbindlist(lapply(ppos_res, \(x) x[["alpha"]]), idcol = "configuration", fill = TRUE)
+
+ppos_cfg[, OR := sapply(eta, \(x) sprintf("%.2f", exp(x[3])))]
+```
+
+
+```{r}
+# Apply stopping rule and assess power
+ppos_ctr_wide <- dcast(
+  ppos_ctr, 
+  configuration + trial + analysis ~ variable, 
+  value.var = c("pr_ctr", "ppos"))
+ppos_ctr_wide <- ppos_ctr_wide[ppos_cfg, on = "configuration"]
+fut_thres <- c(0, 0.02, 0.025, 0.05, 0.1, 0.15, 0.2, 0.25)
+fut_res <- lapply(fut_thres, function(x) decide_futility(ppos_ctr_wide, x))
+stop_res_ppos <- rbindlist(
+  lapply(fut_res, \(x) x[[1]]), idcol = "futility")[, 
+    futility := fut_thres[as.integer(futility)]]
+fin_res_ppos <- rbindlist(
+  lapply(fut_res, \(x) x[[2]]), idcol = "futility")[, 
+    futility := fut_thres[as.integer(futility)]]
+```
+
+
+```{r}
+power <- dcast(
+  stop_res_ppos[analysis == 6 & status == "effective"][ppos_cfg, on = "configuration"],
+  eff_eps + OR ~ futility, value.var = "P")
+setnames(power, "eff_eps", "$\\epsilon_{\\text{eff}}$")
+add_header_above(kable_styling(
+  kable(power, caption = "Probability of effectiveness decision as a function of odds ratio in investigational arm.", 
+        linesep = c('', '', '', '', '', '', '\\addlinespace'),
+        align = "r", booktabs = TRUE, digits = c(3,rep(2,9)), escape = FALSE),
+  font_size = 9, latex_options = "HOLD_position"
+), c(" " = 2, "Futility Threshold" = 8))
+```
+
+
+```{r}
+power <- dcast(
+  stop_res_ppos[analysis == 6 & status == "futile"][ppos_cfg, on = "configuration"],
+  eff_eps + OR ~ futility, value.var = "P")
+setnames(power, "eff_eps", "$\\epsilon_{\\text{eff}}$")
+add_header_above(kable_styling(
+  kable(power, caption = "Power for futility decision as a function of odds ratio in investigational arm.", 
+        linesep = c('', '', '', '', '', '', '\\addlinespace'),
+        align = "r", booktabs = TRUE, digits = c(3,rep(2,9)), escape = FALSE),
+  font_size = 9, latex_options = "HOLD_position"
+), c(" " = 2, "Futility Threshold" = 7))
+```
+
+
+```{r trial-status, fig.cap="Cumulative status of simulated trials at each analysis, where $\\epsilon_{\\text{fut}}=0.02$. To maintain proportions, trial status is carried forward after stopping, e.g. if a trial was futile at analysis 1, then it is also futile at analysis 2 to 6", fig.width=6, fig.height=6}
+ggplot(stop_res_ppos[ppos_cfg, on = "configuration"][futility == 0.02], 
+       aes(analysis, P, fill = status)) +
+  facet_grid(OR ~ eff_eps, labeller = label_both) +
+  geom_bar(stat = "identity") +
+  scale_fill_viridis_d() +
+  labs(y = "Cumulative proportion of trials", x = "Analysis",
+       fill = "Status") +
+  scale_x_continuous(breaks = 1:6)
+```
+
+
+```{r trial-status-2, fig.cap="Marginal status of simulated trials by analysis, where $\\epsilon_{\\text{fut}}=0.02$.", fig.width=6, fig.height=6}
+ggplot(
+  fin_res_ppos[futility == 0.02, .N, keyby = .(eff_eps, OR, analysis, result)][, 
+    P := N / sum(N), 
+    keyby = .(eff_eps, OR)], 
+  aes(analysis, P, fill = result)) +
+  facet_grid(OR ~ eff_eps, labeller = label_both) +
+  geom_bar(stat = "identity") +
+  scale_fill_viridis_d() +
+  labs(y = "Marginal proportion of trials stopped", x = "Analysis",
+       fill = "Status") +
+  scale_x_continuous(breaks = 1:6)
+```
+
+
+\clearpage
+
+# Appendix - Additional Summaries
+
+## Posterior
+
+```{r, fig.cap="Posterior expectation at stopping.", fig.width=6, fig.height=5}
+trial_res <- post_ctr[, .(configuration, trial, analysis, variable, e_ctr, v_ctr, lo_ctr, hi_ctr, pr_ctr)][
+  stop_res[, 
+    .(configuration, trial, OR, analysis, eff_eps, hrm_eps, result)], 
+    on = c("configuration", "trial", "analysis"), allow.cartesian = TRUE]  
+
+ggplot(trial_res[eff_eps == "0.93" & hrm_eps == "0.05"],
+       aes(e_ctr, colour = result)) +
+  facet_grid(OR ~ variable, labeller = label_both) +
+  stat_bin(geom = "step", bins = 50, position = "identity") +
+  geom_vline(xintercept = 0, lty = 2) +
+  labs(x = "Posterior mean", y = "Frequency of trials")
+```
+
+\clearpage
+
+## Predictive Probability of Success
+
+```{r post-prob-ppos-relationship, fig.cap = "Estimated relationship of predicted probability of success (PPoS), posterior probability of effectiveness, and sample size for contrast of arm 3 vs arm 1.", fig.height=3, fig.width=6}
+ggplot(ppos_ctr[analysis < 6 & variable == "3v1"][ppos_cfg, on = "configuration"], aes(pr_ctr, ppos)) + 
+  facet_grid(eff_eps ~ analysis, labeller = label_both) + 
+  geom_point() +
+  geom_smooth(method = "loess", span = 1/4, se = F) +
+  geom_vline(xintercept = 0.5, lty = 2) +
+  labs(x = bquote(Pr(beta > 0~'|'~y)),
+       y = bquote(PPoS(y))) +
+  scale_y_continuous(breaks = seq(0, 1, 0.10)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+```{r unconditional-post-prob, fig.cap="Unconditional summary of contrast posterior probability by sample size. The red point and error bars give the mean and lower and upper 25\\% quartiles. Columns are sample sizes, rows are effect sizes (odds ratios).",fig.height=6, fig.width=6, include=FALSE}
+ggplot(ppos_ctr[ppos_cfg, on = "configuration"], aes(variable, pr_ctr)) +
+  facet_grid(OR ~ analysis) +
+  geom_jitter(alpha = 0.1) +
+  geom_violin() +
+  stat_summary(fun.data = "mean_quantile", col = "red", size = 0.25) +
+  labs(x = "Contrast", y = "Pr(contrast > 0 | data)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+```{r, fig.cap="Unconditional summary of contrast predicted probability of success by sample size. The red point and error bars give the mean and lower and upper 25\\% quartiles. Columns are sample sizes, rows are effect sizes (odds ratios).", fig.height=6, fig.width=6, include=FALSE}
+ggplot(ppos_ctr, aes(variable, ppos)) +
+  facet_grid(configuration ~ analysis) +
+  geom_jitter(alpha = 0.15) +
+  geom_violin() +
+  stat_summary(fun.data = "mean_quantile", col = "red", size = 0.25) +
+  labs(x = "Contrast", y = "PPoS(m | data)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+```{r joint-vs-single, fig.cap="Unconditional summary of contrast posterior probability by sample size. The red point and error bars give the mean and lower and upper 25\\% quartiles. Columns are sample sizes, rows are effect sizes (odds ratios).",fig.height=6, fig.width=6, include=FALSE, eval=FALSE}
+ggplot(ppos_ctr_wide, aes(pmin(pr_ctr_3v1, pr_ctr_3v2), pr_ctr_3v1and2)) +
+  facet_grid(OR ~ analysis) +
+  geom_point() +
+  geom_abline(col = 'red') +
+  labs(y = "Pr(arm 3 > arm 2 and arm 1)",
+       x = "min(Pr(arm 3 > arm1), Pr(arm 3 > arm 2))") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
