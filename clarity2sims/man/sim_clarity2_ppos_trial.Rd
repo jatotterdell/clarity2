@@ -9,15 +9,18 @@ sim_clarity2_ppos_trial(
   n_seq = seq(600, 2100, 300),
   p_assign = rep(1/3, 3),
   alpha = stats::qlogis(cumsum(c(16, 28, 32, 12, 2, 2, 2, 6)/100)[1:7]),
-  eta = c(0, -0.5, 0.5),
+  eta = c(0, 0, 0),
   eff_eps = 0.975,
   fut_eps = 0.02,
   B_ppos = 500,
+  stage2 = "all",
+  drop_controls = FALSE,
+  alt_starting_passign = TRUE,
   ...
 )
 }
 \arguments{
-\item{mod}{A list including the stan model as first element, and standata as second}
+\item{mod}{A list including the stan model as first element, and standata as second, and approximation stan model as third element}
 
 \item{n_seq}{Sequence of interim analysis sample sizes}
 
@@ -32,6 +35,16 @@ sim_clarity2_ppos_trial(
 \item{fut_eps}{Futility threshold}
 
 \item{B_ppos}{Number of draws to use for calculating PPoS}
+
+\item{stage2}{Which arms to take into Stage 2? "all" takes both controls, "first" always takes control 1
+and "best" always takes the one with highest posterior mean log-odds.
+We can equate "first" to a random choice if both controls are equivalent.}
+
+\item{drop_controls}{Should control groups be dropped if found inferior
+(pairwise) to intervention?}
+
+\item{alt_starting_passign}{Use alternative initial p_assign where two arms
+1:1 for first 80 followed by 3 arms 1:1:1 for 520.}
 
 \item{...}{Additional arguments to rstan::sampling}
 }

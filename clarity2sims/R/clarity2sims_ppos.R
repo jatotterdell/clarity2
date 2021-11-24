@@ -59,14 +59,13 @@ approximate_posterior <- function(mod, moddat, collapse_levels = TRUE) {
 #' @param mod An rstan model
 #' @param dat The current data for the model
 #' @param yimp The imputed sets (impute_data) of data to be combined with dat
-#' @param epsilon Threshold for deciding superiority at maximum sample size
+#' @param delta Reference effect size
 #' @param n_draws Number of posterior draws to use in calculating PPoS
 #' @importFrom rstan optimizing
 calc_ppos <- function(mod, dat, yimp, delta = 0, n_draws = 0) {
   B <- dim(yimp)[3]
   yobs <- dat$y
   pr_clt0 <- matrix(0, B, 3)
-  # Cmat <- rbind(c(0, 1), c(-1, 1))  # Or whatever contrast
   Cmat <- dat$C
   Xmat <- dat$X
   for (b in 1:B) {
@@ -140,9 +139,14 @@ assess_futility <- function(mod, moddat, n, p, n_max, n_sim = 1, B = 500) {
 #' @param stage2 Which arms to take into Stage 2? "all" takes both controls, "first" always takes control 1
 #' and "best" always takes the one with highest posterior mean log-odds.
 #' We can equate "first" to a random choice if both controls are equivalent.
+#' @param drop_controls Should control groups be dropped if found inferior
+#' (pairwise) to intervention?
+#' @param alt_starting_passign Use alternative initial p_assign where two arms
+#' 1:1 for first 80 followed by 3 arms 1:1:1 for 520.
 #' @param ... Additional arguments to rstan::sampling
 #' @return A list
 #' @importFrom rstan sampling
+#' @importFrom HDInterval hdi
 #' @export
 sim_clarity2_ppos_trial <- function(
   mod,
@@ -154,6 +158,8 @@ sim_clarity2_ppos_trial <- function(
   fut_eps = 0.02,
   B_ppos = 500,
   stage2 = "all",
+  drop_controls = FALSE,
+  alt_starting_passign = TRUE,
   ...) {
 
   N <- length(p_assign)
@@ -197,7 +203,15 @@ sim_clarity2_ppos_trial <- function(
       }
     }
     # Treatment assignment
-    x_new <- permuted_block_rand(p_assign, n_new[i], 2 * N)[["trt"]]
+    if (alt_starting_passign & i == 1) {
+      x_new <- c(
+        permuted_block_rand(c(0, 0.5, 0.5), 80, 2 * N)[["trt"]],
+        permuted_block_rand(p_assign, n_new[i] - 80, 2 * N)[["trt"]]
+      )
+    } else {
+      x_new <- permuted_block_rand(p_assign, n_new[i], 2 * N)[["trt"]]
+    }
+
     n_x <- table(factor(x_new, levels = seq_len(length(p_assign))))
     y_new <- generate_data_p(n_x, p)
     y <- y + y_new
@@ -236,7 +250,17 @@ sim_clarity2_ppos_trial <- function(
                      matrixStats::colMeans2(post_eta[, 2] > 0 & post_eta[, 2] - post_eta[, 1] > 0))
     i_ctr[i, ] <- as.integer(pr_ctr[i, ] > eff_eps)
     i_ppos[i, ] <- as.integer(ppos[i, ] < fut_eps)
-    # if (i < n_int && i_ppos[i, 1] == 1) break
+
+    # If drop control arms, then need to only assess futility on remaining active arms
+    if (drop_controls) {
+      # once an arm is dropped it stays dropped
+      if (i > 1) i_ctr[i, 1:2] <- as.integer(i_ctr[i, 1:2] | i_ctr[i - 1, 1:2])
+      # if both control arms have been dropped, then stop
+      if (all(i_ctr[i, 1:2] == 1)) break
+      # otherwise, continue to allocate to continuing arms
+      p_assign <- c(1 - i_ctr[i, 1:2], 1)
+      p_assign <- p_assign / sum(p_assign)
+    }
   }
   ind <- 1:i
 
@@ -258,6 +282,7 @@ sim_clarity2_ppos_trial <- function(
   )
   out_ctr <- list(
     pr_ctr = pr_ctr[ind, , drop = F],
+    i_ctr  = i_ctr[ind, , drop = F],
     ppos   = ppos[ind, , drop = F]
   )
   y_obs <- y_obs[ind, , , drop = FALSE]

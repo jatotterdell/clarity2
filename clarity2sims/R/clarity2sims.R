@@ -27,8 +27,6 @@ update_model <- function(mod, moddat, ...) {
 #' @param stage2 Which arms to take into Stage 2? "all" takes both controls, "first" always takes control 1
 #' and "best" always takes the one with highest posterior mean log-odds.
 #' We can equate "first" to a random choice if both controls are equivalent.
-#' @param drop_arms If drop_arms is TRUE, then a control arm may be dropped and the trial continues.
-#' A single control will be dropped if the investigational arm is found effective relative to it.
 #' @param ... Other arguments to cmdstanr::sample, e.g. adapt_delta, chains, etc.
 #' @return A list of trial related data.tables
 #' @export

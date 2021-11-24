@@ -4,7 +4,7 @@
 \alias{calc_ppos}
 \title{calc_ppos}
 \usage{
-calc_ppos(mod, dat, yimp, epsilon = 0.975, n_draws = 0)
+calc_ppos(mod, dat, yimp, delta = 0, n_draws = 0)
 }
 \arguments{
 \item{mod}{An rstan model}
@@ -13,7 +13,7 @@ calc_ppos(mod, dat, yimp, epsilon = 0.975, n_draws = 0)
 
 \item{yimp}{The imputed sets (impute_data) of data to be combined with dat}
 
-\item{epsilon}{Threshold for deciding superiority at maximum sample size}
+\item{delta}{Reference effect size}
 
 \item{n_draws}{Number of posterior draws to use in calculating PPoS}
 }

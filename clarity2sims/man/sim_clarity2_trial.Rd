@@ -9,8 +9,9 @@ sim_clarity2_trial(
   n_seq = seq(600, 2100, 300),
   p_assign = rep(1/3, 3),
   alpha = stats::qlogis(cumsum(c(16, 29, 32, 13, 2, 1, 1, 6)/100)[1:7]),
-  eta = c(0, -0.5, 0.5),
+  eta = c(0, 0, 0),
   eff_eps = 0.975,
+  stage2 = "all",
   ...
 )
 }
@@ -26,6 +27,10 @@ sim_clarity2_trial(
 \item{eta}{True eta parameter}
 
 \item{eff_eps}{Effectiveness threshold}
+
+\item{stage2}{Which arms to take into Stage 2? "all" takes both controls, "first" always takes control 1
+and "best" always takes the one with highest posterior mean log-odds.
+We can equate "first" to a random choice if both controls are equivalent.}
 
 \item{...}{Other arguments to cmdstanr::sample, e.g. adapt_delta, chains, etc.}
 }

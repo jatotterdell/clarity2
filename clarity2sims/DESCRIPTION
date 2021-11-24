@@ -13,6 +13,7 @@ RoxygenNote: 7.1.2
 Imports: 
     cmdstanr,
     data.table,
+    HDInterval,
     matrixStats,
     mvtnorm,
     parallel,
