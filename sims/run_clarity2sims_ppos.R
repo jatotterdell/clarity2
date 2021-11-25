@@ -93,6 +93,7 @@ for (z in run_row) {
       alpha = cfg[z][["alpha"]][[1]],
       eta = cfg[z][["eta"]][[1]],
       stage2 = "all",
+      drop_controls = TRUE,
       refresh = 0
     )
   }, mc.cores = num_cores)
