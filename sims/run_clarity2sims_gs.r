@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 library(clarity2sims)
 library(cmdstanr)
 library(posterior)

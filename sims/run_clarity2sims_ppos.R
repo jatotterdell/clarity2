@@ -1,12 +1,15 @@
-library(clarity2sims)
-library(rstan)
-library(posterior)
-library(data.table)
-library(parallel)
-library(matrixStats)
-library(mvtnorm)
-library(optparse)
+#!/usr/bin/env Rscript
 
+suppressMessages({
+  library(clarity2sims)
+  library(rstan)
+  library(posterior)
+  library(data.table)
+  library(parallel)
+  library(matrixStats)
+  library(mvtnorm)
+  library(optparse)
+})
 
 # ----- Command line arguments -----
 option_list <- list(
@@ -17,11 +20,16 @@ option_list <- list(
   make_option(c("-n", "--nsim"),
     type = "integer", default = 10,
     help = "number of simulations to run under each configuration", metavar = "character"
+  ),
+  make_option(c("-f", "--filename"),
+    type = "character", default = "ppos_sims_",
+    help = "the output file name for the simulations", metavar = "character"
   )
 )
 opt <- parse_args(OptionParser(option_list = option_list))
 num_cores <- opt$cores
 num_sims <- opt$nsim
+file_name <- opt$filename
 
 
 # ----- Compile the model -----
@@ -110,8 +118,7 @@ for (z in run_row) {
       runtime = end_time - start_time
     ),
     paste0(
-      "~/out_files/clarity2_sims/new2_ppos_",
-      formatC(z, width = 2, flag = "0"), ".rds"
+      "~/out_files/clarity2_sims/", file_name, formatC(z, width = 2, flag = "0"), ".rds"
     )
   )
 }
