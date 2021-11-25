@@ -1,8 +1,14 @@
 ---
 title: "Ordinal Regression Model"
 author: "James Totterdell"
-date: "`r Sys.Date()`"
-output: bookdown::pdf_document2
+date: "2021/10/25"
+output: 
+  bookdown::pdf_document2:
+    theme: readable
+    highlight: espresso
+    latex_engine: xelatex
+  md_document:
+    variant: markdown_github
 ---
 
 ```{r setup, include=FALSE}
@@ -58,13 +64,13 @@ Also `c` corresponds to $\alpha$.
 
 ## Per-participant implementation
 
-```{r}
+```{r code-model-1}
 writeLines(readLines("../stan/ordmod.stan"))
 ```
 
 ## Per-pattern implementation
 
-```{r}
+```{r code-model-2}
 writeLines(readLines("../stan/ordmodagg.stan"))
 ```
 
@@ -78,7 +84,7 @@ Per-pattern has much lower computational overhead than per-participant (3 likeli
 
 If this is still too computationally demanding for sims, then can look at Laplace approximation for the posterior instead.
 
-```{r}
+```{r example-1}
 library(Hmisc)
 library(data.table)
 library(cmdstanr)
@@ -153,17 +159,18 @@ as_draws_rvars(ordmodaggfit$draws("alpha"))
 
 ### Posteriors
 
-```{r}
+```{r posterior-beta}
 mcmc_hist(as_draws_matrix(ordmodaggfit$draws("beta")))
 ```
 
 
-```{r}
+```{r posterior-alpha}
 mcmc_hist(as_draws_matrix(ordmodaggfit$draws("alpha")))
 ```
+
 ## Example 2
 
-```{r}
+```{r example-2}
 # Simulate some outcome data
 N <- 600
 p <- rbind(
@@ -229,11 +236,17 @@ as_draws_rvars(ordmodaggfit$draws("alpha"))
 
 ### Posteriors
 
-```{r}
+```{r posterior-beta-2}
 mcmc_hist(as_draws_matrix(ordmodaggfit$draws("beta")))
 ```
 
 
-```{r}
+```{r posterior-alpha-2}
 mcmc_hist(as_draws_matrix(ordmodaggfit$draws("alpha")))
+```
+
+# Session Info
+
+```{r info}
+sessionInfo()
 ```
