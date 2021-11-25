@@ -1,0 +1,239 @@
+---
+title: "Ordinal Regression Model"
+author: "James Totterdell"
+date: "`r Sys.Date()`"
+output: bookdown::pdf_document2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+# Model
+
+Let $Y_i\in\{1,...,8\}$ be the day 14 outcome for participant $i$ where 1 is best and 8 is worst (death).
+Let $\tau_i\in\{1,2,3\}$ denote treatment arm and $x_i$ the corresponding design encoding.
+For the (reduced) primary model we specify
+$$
+\mathbb P[Y_i\leq k|\alpha,\beta;x_i] = \text{logit}^{-1}(\alpha_k + x_i^\mathsf{T}\beta),\quad i=1,2,...,\ k=1,...,7,
+$$
+where $\{\alpha_k\}$ is increasing in $k$ and $\beta = (\beta_1, \beta_2)^\mathsf{T}$ represent the cumulative log-odds ratio of treatments 2 and 3 relative to 1.
+
+Define the outcome level probabilities in the control group by $\pi_k = \mathbb P[Y = k|\alpha]$, for $k=1,...,8$ where
+$$
+\pi_k = \begin{cases}
+1 - \text{logit}^{-1}(\alpha_1) & \text{if }k=1 \\
+\text{logit}^{-1}(\alpha_{k-1}) - \text{logit}^{-1}(\alpha_k) & \text{if }k\in\{2,...,7\}\\
+\text{logit}^{-1}(\alpha_{7}) & \text{if } k=8
+\end{cases}
+$$
+
+We specify the priors on the level probabilities as Dirichlet on the simplex,
+$$
+\pi \sim \text{Dirichlet}(\kappa)
+$$
+for some $\kappa = (\kappa_1,...,\kappa_8)$ where the sum $\sum \kappa_k$ gives the concentration.
+For uninformative we would usually choose something like $\sum \kappa_k=1$.
+
+For the coefficients we specify
+$$
+\beta \sim \text{Normal}(0, \sigma_\beta)
+$$
+for some chosen value $\sigma_\beta$.
+
+\clearpage
+
+# Stan code
+
+Given that we will only be simulating discrete covariates, we can collapse the model by covariate pattern.
+E.g. rather than model $Y_i\in\{1,...,8\}$ for $i=1,...,n$ we can collapse into $J$ covariate patterns and model
+$Y_j\in\{1,...,8\}$ weighted by $n_j$ with $\sum_j n_j = n$.
+
+Note, in the following code `prior_counts` corresponds to $\kappa$, and `prior_sd` to $\sigma_\beta$ in the above.
+Also `c` corresponds to $\alpha$.
+
+## Per-participant implementation
+
+```{r}
+writeLines(readLines("../stan/ordmod.stan"))
+```
+
+## Per-pattern implementation
+
+```{r}
+writeLines(readLines("../stan/ordmodagg.stan"))
+```
+
+\clearpage
+
+# Example Use
+
+## Example 1
+
+Per-pattern has much lower computational overhead than per-participant (3 likelihood evaluations vs 2,100).
+
+If this is still too computationally demanding for sims, then can look at Laplace approximation for the posterior instead.
+
+```{r}
+library(Hmisc)
+library(data.table)
+library(cmdstanr)
+library(posterior)
+library(bayesplot)
+
+ordmod <- cmdstan_model("../stan/ordmod.stan")
+ordmodagg <- cmdstan_model("../stan/ordmodagg.stan")
+
+# Simulate some outcome data
+N <- 2100
+p <- rbind(
+  rep(1/ 8, 8),
+  pomodm(p = rep(1/ 8, 8), odds.ratio = 2), # Odds ratio for 2 for arm 2
+  pomodm(p = rep(1/ 8, 8), odds.ratio = 0.5)) # Odds ratio of 0.5 for arm 3
+x <- factor(1:3)
+n <- rep(N/3, 3)
+y <- matrix(0, 3, 8)
+
+xx <- rep(x, times = N/3)
+for(i in 1:N) {
+  y[i] <- sample.int(8, 1, prob = p[xx[i], ])
+}
+D <- data.table(x = x, y = y)
+Dagg <- D[, .N, keyby = .(x, y)]             # Per-participant uses long format
+Dwide <- dcast(Dagg, x ~ y, value.var = 'N') # Aggregated model uses wide format
+
+# Sanity check
+mle_fit <- MASS::polr(ordered(y) ~ x, data = D)
+
+X <- model.matrix( ~ x, data = D)[, -1]
+ordmoddat <- list(
+  y = D$y,
+  N = nrow(D),
+  K = 8,
+  P = ncol(X),
+  X = X,
+  prior_counts = rep(1/8, 8),
+  prior_sd = rep(1, 2)
+)
+ordmodfit <- ordmod$sample(
+  data = ordmoddat,
+  chains = 5,
+  parallel_chains = 5,
+  refresh = 0,
+  iter_warmup = 500, iter_sampling = 2000)
+
+ordmodaggdat <- list(
+  N = 3,
+  K = 8,
+  P = 2,
+  y = as.matrix(Dwide[, -1]),
+  X = model.matrix( ~ x)[, -1],
+  prior_counts = rep(1/8, 8),
+  prior_sd = rep(1, 2)
+)
+ordmodaggfit <- ordmodagg$sample(
+  data = ordmodaggdat,
+  chains = 5,
+  parallel_chains = 5,
+  refresh = 0,
+  iter_warmup = 500, iter_sampling = 2000)
+
+# Check consistency of result
+coef(mle_fit)
+as_draws_rvars(ordmodfit$draws("beta"))
+as_draws_rvars(ordmodaggfit$draws("beta"))
+
+as_draws_rvars(ordmodfit$draws("c"))
+as_draws_rvars(ordmodaggfit$draws("alpha"))
+```
+
+### Posteriors
+
+```{r}
+mcmc_hist(as_draws_matrix(ordmodaggfit$draws("beta")))
+```
+
+
+```{r}
+mcmc_hist(as_draws_matrix(ordmodaggfit$draws("alpha")))
+```
+## Example 2
+
+```{r}
+# Simulate some outcome data
+N <- 600
+p <- rbind(
+  rep(1/ 8, 8),
+  pomodm(p = rep(1/ 8, 8), odds.ratio = 2), # Odds ratio for 2 for arm 2
+  pomodm(p = rep(1/ 8, 8), odds.ratio = 0.5)) # Odds ratio of 0.5 for arm 3
+x <- factor(1:3)
+n <- rep(N/3, 3)
+y <- matrix(0, 3, 8)
+
+xx <- rep(x, times = N/3)
+for(i in 1:N) {
+  y[i] <- sample.int(8, 1, prob = p[xx[i], ])
+}
+D <- data.table(x = x, y = y)
+Dagg <- D[, .N, keyby = .(x, y)]             # Per-participant uses long format
+Dwide <- dcast(Dagg, x ~ y, value.var = 'N') # Aggregated model uses wide format
+
+# Sanity check
+mle_fit <- MASS::polr(ordered(y) ~ x, data = D)
+
+X <- model.matrix( ~ x, data = D)[, -1]
+ordmoddat <- list(
+  y = D$y,
+  N = nrow(D),
+  K = 8,
+  P = ncol(X),
+  X = X,
+  prior_counts = rep(1/8, 8),
+  prior_sd = rep(1, 2)
+)
+ordmodfit <- ordmod$sample(
+  data = ordmoddat,
+  chains = 5,
+  parallel_chains = 5,
+  refresh = 0,
+  iter_warmup = 500, iter_sampling = 2000)
+
+ordmodaggdat <- list(
+  N = 3,
+  K = 8,
+  P = 2,
+  y = as.matrix(Dwide[, -1]),
+  X = model.matrix( ~ x)[, -1],
+  prior_counts = rep(1/8, 8),
+  prior_sd = rep(1, 2)
+)
+ordmodaggfit <- ordmodagg$sample(
+  data = ordmodaggdat,
+  chains = 5,
+  parallel_chains = 5,
+  refresh = 0,
+  iter_warmup = 500, iter_sampling = 2000)
+
+# Check consistency of result
+coef(mle_fit)
+as_draws_rvars(ordmodfit$draws("beta"))
+as_draws_rvars(ordmodaggfit$draws("beta"))
+
+as_draws_rvars(ordmodfit$draws("c"))
+as_draws_rvars(ordmodaggfit$draws("alpha"))
+```
+
+### Posteriors
+
+```{r}
+mcmc_hist(as_draws_matrix(ordmodaggfit$draws("beta")))
+```
+
+
+```{r}
+mcmc_hist(as_draws_matrix(ordmodaggfit$draws("alpha")))
+```
