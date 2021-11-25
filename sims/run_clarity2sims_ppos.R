@@ -15,15 +15,15 @@ suppressMessages({
 option_list <- list(
   make_option(c("-c", "--cores"),
     type = "integer", default = 10,
-    help = "number of cores to use", metavar = "character"
+    help = "number of cores to use [default %default]", metavar = "number"
   ),
   make_option(c("-n", "--nsim"),
     type = "integer", default = 10,
-    help = "number of simulations to run under each configuration", metavar = "character"
+    help = "number of simulations to run under each configuration [default %default]", metavar = "number"
   ),
   make_option(c("-f", "--filename"),
     type = "character", default = "ppos_sims_",
-    help = "the output file name for the simulations", metavar = "character"
+    help = "the output file name for the simulations [default %default]", metavar = "character"
   )
 )
 opt <- parse_args(OptionParser(option_list = option_list))
