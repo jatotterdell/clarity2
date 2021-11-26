@@ -229,7 +229,7 @@ sim_clarity2_ppos_trial <- function(
       y_imp <- impute_data(x_imp, P[, , sample.int(dim(P)[3], size = B_ppos)])
       ppos[i, ] <- matrixStats::colMeans2(calc_ppos(mod[[3]], mod[[2]], y_imp, n_draws = 0) > eff_eps)
     } else {
-      ppos[i, ] <- NA
+      ppos[i, ] <- as.integer(pr_ctr[i, ] > eff_eps)
     }
     n_obs[i, ] <- rowSums(y)
     e_alpha[i, ] <- matrixStats::colMeans2(post_alpha)
