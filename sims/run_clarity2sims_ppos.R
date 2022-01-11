@@ -9,6 +9,7 @@ suppressMessages({
   library(matrixStats)
   library(mvtnorm)
   library(optparse)
+  library(bayestestR)
 })
 
 # ----- Command line arguments -----
@@ -39,7 +40,8 @@ ordmodat <- list(
   K = 8,
   P = 2,
   y = matrix(0, 3, 8),
-  X = rbind(0, c(1, 0), c(1, 1)),
+  # X = rbind(0, c(1, 0), c(1, 1)),
+  X = bayestestR::contr.orthonorm(3),
   C = rbind(c(0, 1), c(-1, 1)),
   prior_counts = 2 * rep(1 / 8, 8),
   prior_sd = rep(1, 2)

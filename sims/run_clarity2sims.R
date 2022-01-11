@@ -24,7 +24,8 @@ num_sims  <- opt$nsim
 ordmod <- clarity2sims:::compile_cmdstanr_mod()
 ordmoddat <- list(
   N = 3, P = 2, K = 8,
-  X = rbind(0, c(1, 0), c(1, 1)),
+  # X = rbind(0, c(1, 0), c(1, 1)),
+  X = bayestestR::contr.orthonorm(3),
   prior_counts = rep(2 / 8, 8),
   prior_sd = rep(1, 2))
 mod <- list(ordmod, ordmoddat)
@@ -83,6 +84,6 @@ for (z in run_row) {
                trial = resl_trial,
                contr = resl_contr,
                runtime = end_time - start_time),
-          paste0("~/out_files/clarity2_sims/pprob_",
+          paste0("~/out_files/clarity2_sims/test_centered",
                  formatC(z, width = 2, flag = "0"), ".rds"))
 }
