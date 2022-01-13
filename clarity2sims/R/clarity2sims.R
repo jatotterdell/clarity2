@@ -41,6 +41,8 @@ sim_clarity2_trial <- function(mod,
 
   N <- length(p_assign)
   K <- length(alpha) + 1
+  X <- mod[[2]]$X
+  C <- mod[[2]]$C
   n_max <- max(n_seq)
   n_new <- diff(c(0, n_seq))
   n_int <- length(n_seq)
@@ -83,7 +85,7 @@ sim_clarity2_trial <- function(mod,
 
     fit <- update_model(mod[[1]], mod[[2]], ...)
     # Define contrasts
-    ctr <- c(fit$eta[3], fit$eta[3] - fit$eta[2], fit$eta[3] - posterior::rvar_max(c(fit$eta[1], fit$eta[2])))
+    ctr <- c(fit$eta[3] - fit$eta[1], fit$eta[3] - fit$eta[2], fit$eta[3] - posterior::rvar_max(c(fit$eta[1], fit$eta[2])))
     # Summarise contrasts
     e_ctr[i, ] <- posterior::E(ctr)
     v_ctr[i, ] <- posterior::var(ctr)

@@ -178,7 +178,9 @@ sim_clarity2_ppos_trial <- function(
   e_alpha <- matrix(0, n_int, K - 1, dimnames = list("analysis" = 1:n_int, "variable" = 1:(K - 1)))
   lo_alpha <- hi_alpha <- v_alpha <- e_alpha
   e_beta <- matrix(0, n_int, N - 1, dimnames = list("analysis" = 1:n_int, "variable" = 2:3))
-  v_eta <- e_eta <- lo_eta <- hi_eta <- v_beta <- e_beta
+  v_beta <- e_beta
+  e_eta <- matrix(0, n_int, N, dimnames = list("analysis" = 1:n_int, "variable" = 1:3))
+  v_eta <- lo_eta <- hi_eta <- e_eta
   pr_ctr <- matrix(0, n_int, 3, dimnames = list("analysis" = 1:n_int, "contrast" = c("3v1", "3v2", "3v1and2")))
   e_ctr <- pr_ctr
   ppos <- matrix(0, n_int, 3, dimnames = list("analysis" = 1:n_int, "contrast" = c("3v1", "3v2", "3v1and2")))
@@ -222,7 +224,7 @@ sim_clarity2_ppos_trial <- function(
     post_p <- post_draws[, grepl("p\\[", colnames(post_draws))]
     post_alpha <- post_draws[, grepl("^alpha", colnames(post_draws))]
     post_beta <- post_draws[, grepl("^beta\\[", colnames(post_draws))]
-    post_eta <- post_draws[, grepl("^eta\\[[2-3]", colnames(post_draws))]
+    post_eta <- post_draws[, grepl("^eta\\[", colnames(post_draws))]
     if (i < n_int) {
       P <- aperm(array(c(post_p), dim = list(nrow(post_p), nrow(p), ncol(p))), c(2, 3, 1))
       x_imp <- table(factor(permuted_block_rand(p_assign, n_left[i], 2 * N)[["trt"]], levels = seq_len(N)))
@@ -245,9 +247,13 @@ sim_clarity2_ppos_trial <- function(
     lo_eta[i, ] <- tmp[1, ]
     hi_eta[i, ] <- tmp[2, ]
     # is arm 3 better than arm 2, and arm 1 and 2?
-    pr_ctr[i, ] <- c(matrixStats::colMeans2(post_eta[, 2] > 0),
-                     matrixStats::colMeans2(post_eta[, 2] - post_eta[, 1] > 0),
-                     matrixStats::colMeans2(post_eta[, 2] > 0 & post_eta[, 2] - post_eta[, 1] > 0))
+    e_ctr[i, ] <- c(
+      matrixStats::colMeans2(post_eta[, 3] - post_eta[, 1]),
+      matrixStats::colMeans2(post_eta[, 3] - post_eta[, 2]),
+      matrixStats::colMeans2(post_eta[, 3] - rowMaxs(post_eta[, 1:2])))
+    pr_ctr[i, ] <- c(matrixStats::colMeans2(post_eta[, 3] - post_eta[, 1] > 0),
+                     matrixStats::colMeans2(post_eta[, 3] - post_eta[, 2] > 0),
+                     matrixStats::colMeans2(post_eta[, 3] - post_eta[, 1] > 0 & post_eta[, 3] - post_eta[, 2] > 0))
     i_ctr[i, ] <- as.integer(pr_ctr[i, ] > eff_eps)
     i_ppos[i, ] <- as.integer(ppos[i, ] < fut_eps)
 
@@ -282,6 +288,7 @@ sim_clarity2_ppos_trial <- function(
   )
   out_ctr <- list(
     pr_ctr = pr_ctr[ind, , drop = F],
+    e_ctr = e_ctr[ind, , drop = F],
     i_ctr  = i_ctr[ind, , drop = F],
     ppos   = ppos[ind, , drop = F]
   )
