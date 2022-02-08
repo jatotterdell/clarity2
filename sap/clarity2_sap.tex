@@ -1,0 +1,355 @@
+\documentclass[11pt,parskip=full-]{scrartcl}
+
+\usepackage{amsmath, amssymb}
+\usepackage{fontspec}
+\usepackage{newpxtext,newpxmath}
+\usepackage{graphicx,grffile}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage[backend=biber,style=nature]{biblatex}
+
+\renewcommand{\arraystretch}{1}
+\onehalfspacing
+\AfterTOCHead{\singlespacing}
+
+\RedeclareSectionCommand[
+  afterskip=1sp]{section}
+\RedeclareSectionCommand[
+  afterskip=1sp]{subsection}
+\RedeclareSectionCommand[
+  afterskip=1sp]{subsubsection}
+
+% Custom commands
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+  % enumitem options
+\setlist[itemize]{parsep=2pt}
+\setlist[enumerate]{parsep=2pt}
+  
+
+\begin{document}
+
+\title{Statistical Analysis Plan}
+\subtitle{CLARITY 2}
+\author{James Totterdell}
+\date{\today}
+
+\makeatletter
+    \begin{titlepage}
+        \begin{center}
+            \includegraphics[width=0.7\linewidth]{clarity-logo.jpg}\\[4ex]
+            {\huge \bfseries  \@title }\\[2ex] 
+            {\LARGE \bfseries  \@subtitle }\\[2ex] 
+            {\LARGE  \@author}\\[50ex] 
+            {\large \@date}
+        \end{center}
+    \end{titlepage}
+\makeatother
+\thispagestyle{empty}
+\newpage
+
+\tableofcontents
+
+\clearpage
+
+\section*{Preface}
+
+This statistical analysis plan (SAP) outlinse the data and procedures for analysing effectiveness and safety of trial interventions from the protocol CLARITY 2.0: An Investigator Initiated, International Multi-Centre, Multi-Arm, Multi-Stage Randomised Double Blind Placebo Controlled Trial of Angiotensin Receptor Blocker (ARB) \& Chemokine Receptor Type 2 (CCR2) Antagonist for the Treatment of COVID-19
+
+The following documents were reviewed when preparing this SAP:
+\begin{itemize}
+    \item CLARITY 2.0 Study Protocol version 2.0 24 September 2021
+\end{itemize}
+
+\section*{Version History}
+
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{lllp{5cm}}
+            \hline
+            Version & Date       & Author           & Description \\
+            \hline
+            0.1     & 2022-02-08 & James Totterdell & First draft \\
+            \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+\section*{Abbreviations}
+
+\clearpage
+
+\section{Introduction}
+
+\subsection{Background and Rationale}
+
+\subsection{Study Aims}
+The aim of this study is to evaluate the safety and efficacy of dual treatment with repagermanium and candesartan compared to placebo as treatment for patients hospitalised for management of COVID-19.
+
+\clearpage
+
+%% so footnote doesn't appear in ToC
+\section[Study Design]{Study Design\protect\footnote{from study protocol}}
+CLARITY 2.0 is a prospective, Multi-Centre, Multi-Arm Multi-Stage Randomised, Double Blind, Placebo Controlled Trial, utilising adaptive sample size re-estimation. Stage 1 will include 80 patients for a Phase II safety analysis to be conducted in India. Stage 2 will include 520 participants for review of preliminary efficacy data. Expansion to Stage 3, a full Phase III study, will be subject to review of accumulated data in Stage 1 and Stage 2.
+
+Protocol Stage 1 will be conducted in India only. The rest of the world will initiate the study in Stage 2 regardless of the recruitment status of the Stage 1. Recruitment in India will not continue to Stage 2 until completion of the Stage 1 safety analysis and review and approval of the Indian Central Drugs Standard Control Organization Subject Expert Committee on COVID-19 related proposals.
+
+
+\subsection{Target Population}
+Participants must meet all the inclusion criteria, and none of the exclusion criteria, to be eligible for this trial. No exceptions will be made to these eligibility requirements at the time of randomisation. All enquiries about eligibility should be addressed by contacting the sponsor prior to randomisation.
+
+Adults with laboratory-confirmed diagnosis of SARS-CoV-2 infection intended for hospital admission for management of COVID-19.
+
+\subsubsection{Eligibility}
+
+\textbf{Inclusion criteria:}
+\begin{itemize}
+    \item Adults aged between 18 and 65 years.
+\end{itemize}
+
+\textbf{Exclusion criteria:}
+\begin{itemize}
+    \item Currently treated with an ACEi, ARB or aldosterone antagonist, aliskiren, or ARNi
+\end{itemize}
+
+\subsection{Interventions}
+\textbf{Investigational arm:} Titratable candesartan with commencing dose 4mg tablets twice daily (daily dose 8 mg) + fixed dose repagermanium one x 120mg immediate release capsule twice daily (total daily dose 240mg).
+
+\textbf{Control arm \#1:} Titratable candesartan with commencing dose 4mg tablets twice daily (daily dose 8 mg) + matched placebo repagermanium one capsule twice daily.
+
+\textbf{Control arm \#2:}  Titratable matched placebo candesartan
+one tablet twice daily + matched placebo repagermanium one capsule twice daily.
+
+Treatment for will continue for 28 days.
+
+\subsection{Randomisation}
+Initially, treatment allocation will be with a 1:1 randomisation between two arms in Stage 1, and a 1:1:1 block randomisation between three arms in Stage 2, stratified by centre.
+
+\subsection{Blinding}
+The packaging and labelling of interventions will be designed to maintain blinding to the study team and to participants (double-blind).
+
+\subsection{Sample Size}
+Stage 1 of the trial will recruit 80 participants from India for a safety analysis. Stage 2 of the trial will recruit an additional 520 participants. Information from other relevant trials will be utilised to inform the decision for dropping one of the two control arms.
+
+\subsection{Data Collection}
+
+\clearpage
+
+\section{Study Objectives and Outcomes}
+
+\subsection{Primary Objective and Outcome}
+The primary objective is to evaluate the safety and efficacy of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease, assessed by: \textbf{Clinical Health Score at day 14.}
+
+This Clinical Health Score is determined within an 8-point ordinal scale of health status which is a modified version of the 9-point score developed by the WHO for Coronavirus Disease 2019 (COVID-19) trials. A single score will be reported with higher values corresponding to worse symptoms. The ordinal scale is an assessment of the clinical status of the participant at the first assessment for the day, measured at day 14 after the date of randomisation.
+
+The 8-point ordinal scale used for Clinical Health Score is:
+\begin{enumerate}[nolistsep]
+    \item Not hospitalised, no limitations on activities.
+    \item Not hospitalised, limitation on activities.
+    \item Hospitalised, not requiring supplemental oxygen.
+    \item Hospitalised, requiring supplemental oxygen by mask or nasal prongs.
+    \item  Hospitalised, on non-invasive ventilation or high-flow oxygen devices.
+    \item Hospitalised, requiring intubation and mechanical ventilation.
+    \item Hospitalised, on invasive mechanical ventilation and additional organ support (ECMO).
+    \item Death.
+\end{enumerate}
+
+\subsection{Secondary Objectives and Outcomes}
+The secondary objectives are to evaluate the safety and efficacy of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease, assessed by:
+\begin{enumerate}
+    \item Clinical Health Score at day 28.
+    \item ICU admission (incidence in days 0-28).
+    \item Death (incidence in days 0-28).
+    \item Time to death, assessed from hospital admission to death.
+    \item Acute Kidney Injury (incidence in days 0-28).
+    \item Respiratory Failure (incidence in days 0-28).
+    \item Length of hospital admission (days of inpatient stay from admission to discharge or death).
+    \item Length of ICU Admission (days in ICU from admission to transfer to ward or death).
+    \item Requirement of ventilatory support (count of days with ventilation in days 0-28).
+    \item Requirement of dialysis (count of days with dialysis in days 0-28).
+    \item Clinical Health Score at day 60.
+    \item Clinical Health Score at day 90.
+    \item Clinical Health Score at day 180.
+\end{enumerate}
+
+\subsection{Safety Objectives and Outcomes}
+The specific safety objectives are to evaluate the safety of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease, assessed by incidence of pre-specified clinical events:
+
+\begin{enumerate}[resume]
+    \item Hypotension, requiring an urgent or non-urgent intervention (e.g., reduction in dose or cessation of anti-hypertensive, vasopressors, intravenous fluids). Incidence in days 0-28.
+    \item  Hyperkalaemia (defined as a K>5.5-6.0 mmol/L or requiring an intervention including hospitalisation; K>6.0 mmol/L). Incidence in days 0-28.
+    \item Deranged Liver Function Tests (defined as Aspartate Aminotransferase (AST) and Alanine Aminotransferase (ALT) >Upper Limit of Normal (ULN) or >1.5 times baseline). Incidence in days 0- 28.
+    \item Total SAEs
+\end{enumerate}
+
+\clearpage
+
+\section{Descriptive Analyses}
+
+\subsection{Participant Throughput}
+The flow of participants through the trial will be summarised for each arm using a CONSORT diagram. The flow diagrams will describe the numbers of participants randomly allocated, who received allocation, withdrew consent, and included in the ITT analysis population.
+
+\subsection{Baseline Characteristics}
+The following characteristics will be described separately for patients randomised to each arm:
+\begin{itemize}
+    \item age at randomisation
+    \item sex
+\end{itemize}
+
+\subsection{Completeness of Follow-up}
+The number and percentage of participants with follow-up information at day 14 and at day 28 post randomisation will be reported.
+
+\subsection{Treatment Adherence}
+The number and proportion of patients who did not receive the treatment they were allocated to will be reported (if any). Concomitant medications received during the treatment period will be reported. Details on the number of days/doses of treatment received will be reported for each arm.
+
+\clearpage
+
+\section{Comparative Analyses}
+
+For all outcomes, the primary analyses will be performed on the intention to treat population at the specified number of days after randomisation. Pairwise comparisons will be made between the investigational arm and each control arm.
+
+For all models, any baseline covariates included for adjustment will be mean-centred where appropriate, and the treatment design will use orthonormal contrasts such that intercepts represent the outcome distribution amongst average patients assuming equal weighting across all treatment groups.
+
+\subsection{Primary Outcome}
+The clinical health status at day 14 will be summarised by counts and proportions of patients within each outcome level by study arm. The following Bayesian cumulative logistic regression model will be updated using the available data.
+$$
+    \begin{aligned}
+        y_{i} | \pi;x_i                            & \sim \text{Categorical}(\pi(x_i))           \\
+        \mathbb P(y_i \leq k | \alpha, \beta; x_i) & = \text{logit}^{-1}(\eta_{ik})              \\
+        \eta_{ik}                                  & = \alpha_k + x_i^{\mathsf{T}}\beta + \cdots \\
+        \pi_k(x)                                   & = \begin{cases}
+            1 - \text{logit}^{-1}(\alpha_1 + x^\mathsf{T}\beta)                                                       & k=1               \\
+            \text{logit}^{-1}(\alpha_{k-2} + x^\mathsf{T}\beta) - \text{logit}^{-1}(\alpha_{k-1} + x^\mathsf{T}\beta) & k\in\{2,...,K-1\} \\
+            \text{logit}^{-1}(\alpha_{K-1} + x^\mathsf{T}\beta)                                                       & k=K
+        \end{cases},
+    \end{aligned}
+$$
+with prior distributions
+$$
+    \begin{aligned}
+        \pi(0)          & \sim \text{Dirichlet}(\kappa) \quad \text{(weakly informed by CLARITY 1)} \\
+        \beta_1,\beta_2 & \sim \text{Normal}(0, 1).
+    \end{aligned}
+$$
+Due to the orthornormal design coding, the prior specified on $\pi(0)$ is the prior distribution on the outcome levels for an average patient with equal weighting given to each study arm, rather than the distribution of outcome levels for patients in the double placebo control group.
+
+The posterior distribution of each contrast will be reported along with posterior summaries: median and 95\% credible interval.
+
+\subsection{Secondary Outcomes}
+
+\subsubsection{Clinical health score at day 28}
+The analysis will be analagous to that for clinical health score at day 14, but with a different prior. The prior...
+
+\subsubsection{ICU admission (incidence days 0 - 28)}
+The number and proportion of patients with an any ICU admission in days 0 to 28 will be reported. The total number of ICU admissions, and number of patients with more than 1 will be reported. The following Bayesian negative binomial model will be updated using the available data.
+$$
+    \begin{aligned}
+        y_i|\mu_i,r &\sim \text{Negative-Binomial}(\mu_i, r) \\
+        \mu_i &= \exp(\eta_i) \\
+        \eta_i | \alpha, \beta; x_i &\sim \alpha + x_i^\mathsf{T}\beta + \cdots \\
+        \alpha &\sim t_3(\ln(4), 2.5) \quad \text{(weakly informed)} \\
+        \beta &\overset{\text{iid}}{\sim} \text{Normal}(0, 10) \\
+        r &\sim \text{Half-Cauchy}(0, 10)
+    \end{aligned}
+$$
+
+\textbf{NOTE: assuming this could possible occur more than once per participant, i.e. incidence, other-wise just binomial regression.}
+
+\subsubsection{Death (incidence days 0 - 28)}
+The number and proportion of deaths will be summarised by treatment arm. The following Bayesian logistic regression model will be updated using the available data.
+$$
+    \begin{aligned}
+        y_i | \pi_i              & \sim \text{Bernoulli}(\pi_i)    \\
+        \pi_i                    & = \text{logit}^{-1}(\eta_i)     \\
+        \eta_i|\alpha,\beta; x_i & = \alpha + x_i^\mathsf{T}\beta,
+    \end{aligned}
+$$
+with priors
+$$
+    \begin{aligned}
+        \alpha & \sim \text{Normal}(\text{logit}(0.1), 1) \quad \text{(weakly informed by CLARITY 1)} \\
+        \beta &\overset{\text{iid}}{\sim} \text{Normal}(0, 1),
+    \end{aligned}
+$$
+where the $\alpha$ is the probability of death on average across all treatment groups.
+
+\subsubsection{Time to death (assessed from hospital admission)}
+
+
+\subsubsection{Acute kidney injury (incidence in days 0 - 28)}
+This outcome will be analysed analgously to the death outcome. However, the following priors will instead be specified.
+$$
+    \begin{aligned}
+        \alpha & \sim \text{Normal}(?, 1) \quad \text{(weakly informed by CLARITY 1)} \\
+        \beta &\overset{\text{iid}}{\sim} \text{Normal}(0, 1).
+    \end{aligned}
+$$
+
+\textbf{NOTE: assuming this is likely to only occur once, i.e. binary, other-wise negative-binomial.}
+
+\subsubsection{Respiratory failure (incidence in days 0 - 28)}
+This outcome will be analysed analgously to the death outcome. However, the following priors will instead be specified.
+$$
+    \begin{aligned}
+        \alpha & \sim \text{Normal}(?, 1) \quad \text{(weakly informed by CLARITY 1)} \\
+        \beta &\overset{\text{iid}}{\sim} \text{Normal}(0, 1).
+    \end{aligned}
+$$
+
+\textbf{NOTE: assuming this is likely to only occur once, i.e. binary, otherwise, negative-binomial.}
+
+\subsubsection{Length of hospital admission (days of inpatient stay from admission to discharge or death)}
+Descriptive summary... The following Bayesian zero-truncated (ZT) (assuming only days 1 to 28 are valid outcome values) negative binomial model will be updated using the available data.
+$$
+    \begin{aligned}
+        y_i|\mu_i,r &\sim \text{ZT-Negative-Binomial}(\mu_i, r) \\
+        \mu_i &= \exp(\eta_i) \\
+        \eta_i | \alpha, \beta; x_i &\sim \alpha + x_i^\mathsf{T}\beta + \cdots \\
+        \alpha &\sim t_3(\ln(4), 2.5) \quad \text{(weakly informed)} \\
+        \beta &\overset{\text{iid}}{\sim} \text{Normal}(0, 10) \\
+        r &\sim \text{Half-Cauchy}(0, 10).
+    \end{aligned}
+$$
+
+\textbf{NOTES: A potential concern is the possibility for an inflated number of patients with either 1 day or 28 days in hospital. So rather than negative-binomial, an inflation-adjusted model may be more appropriate. Additionally, it is not ideal to treat 2 days in hospital followed by death and 2 days in hospital followed by discharge as equivalent. Could consider number of days alive and free from hospital, with death treated as 0 days. However, this would be a different endpoint, and the specification above is for the defined endpoint.}
+
+\subsubsection{Length of ICU admission (days in ICU from admission to transfer to ward or death)}
+Negative binomial may need to be zero-adjusted, i.e. probability of any ICU admission, then conditional on admission, the number of days. Model selection, i.e. fit NB and ZA-NB and assess model fit.
+
+\subsubsection{Requirement of ventilatory support (number of days with ventilation in days 0 - 28)}
+Negative binomial, may need to be zero-adjusted, i.e. probability of any ventilation, then conditional on requiring ventilation the number of days. Model selection, i.e. fit NB and ZA-NB and assess model fit.
+
+\subsubsection{Requirement of dialysis (number of days with dialysis in days 0 - 28)}
+Negative binomial, may need to be zero-adjusted, i.e. probability of any dialysis, then conditional on requiring dialysis the number of days. Model selection, i.e. fit NB and ZA-NB and assess model fit.
+
+\subsubsection{Clinical health score at day 60}
+The analysis will be analagous to that for clinical health score at day 14, but with a different prior on the outcome distribution. The prior...
+
+\subsubsection{Clinical health score at day 90}
+The analysis will be analagous to that for clinical health score at day 14, but with a different prior on the outcome distribution. The prior...
+
+\subsubsection{Clinical health score at day 180}
+The analysis will be analagous to that for clinical health score at day 14, but with a different prior on the outcome distribution. The prior...
+
+\subsection{Baseline Adjustments}
+As randomisation is stratified by centre, all models will include centre as a random effect.
+
+\subsection{Subgroup Analyses}
+No pre-specified subgroup analyses are planned.
+
+\subsection{Missing Data}
+
+
+\subsection{Software}
+The statistical software R will be used and Bayesian models will be updated from the data using Stan.
+
+\clearpage
+
+\section{Interim Analyses and Trial Reporting}
+
+
+\end{document}
