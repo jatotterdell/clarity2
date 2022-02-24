@@ -1,5 +1,5 @@
-\documentclass[11pt,parskip=full-]{scrartcl}
-
+\documentclass[11pt,parskip=half-]{scrartcl}
+\usepackage[headsepline,footsepline]{scrlayer-scrpage}
 \usepackage{amsmath, amssymb}
 \usepackage{fontspec}
 \usepackage{newpxtext,newpxmath}
@@ -9,18 +9,30 @@
 \usepackage{hyperref}
 \usepackage{float}
 \usepackage{enumitem}
+\usepackage{lastpage}
 \usepackage[backend=biber,style=nature]{biblatex}
 
+\renewcommand\pagemark{{\usekomafont{pagenumber}\thepage\ of \pageref{LastPage}}}
+
+% Setup header
+\automark*{section}
+\clearpairofpagestyles
+\pagestyle{scrheadings}
+\ihead{\headmark}
+\ifoot{CLARITY 2.0 SAP - Version 0.1}
+\ofoot{\pagemark}
+
+% Setup line spacing
 \renewcommand{\arraystretch}{1}
 \onehalfspacing
 \AfterTOCHead{\singlespacing}
 
-\RedeclareSectionCommand[
-  afterskip=1sp]{section}
-\RedeclareSectionCommand[
-  afterskip=1sp]{subsection}
-\RedeclareSectionCommand[
-  afterskip=1sp]{subsubsection}
+%\RedeclareSectionCommand[
+%  afterskip=1sp]{section}
+%\RedeclareSectionCommand[
+%  afterskip=1sp]{subsection}
+%\RedeclareSectionCommand[
+%  afterskip=1sp]{subsubsection}
 
 % Custom commands
 \providecommand{\tightlist}{%
@@ -29,25 +41,29 @@
   % enumitem options
 \setlist[itemize]{parsep=2pt}
 \setlist[enumerate]{parsep=2pt}
-  
+
 
 \begin{document}
-
 \title{Statistical Analysis Plan}
 \subtitle{CLARITY 2}
 \author{James Totterdell}
 \date{\today}
-
 \makeatletter
-    \begin{titlepage}
-        \begin{center}
-            \includegraphics[width=0.7\linewidth]{clarity-logo.jpg}\\[4ex]
-            {\huge \bfseries  \@title }\\[2ex] 
-            {\LARGE \bfseries  \@subtitle }\\[2ex] 
-            {\LARGE  \@author}\\[50ex] 
-            {\large \@date}
-        \end{center}
-    \end{titlepage}
+\begin{titlepage}
+    \begin{center}
+        \includegraphics[width=0.7\linewidth]{clarity-logo.jpg}\\[4ex]
+        {\huge \bfseries  \@title }\\[2ex]
+        {\LARGE \bfseries  \@subtitle }\\[2ex]
+        {\large Version 0.1}\\[2ex]
+        {\large \@date}\\[10ex]
+        \fbox{\begin{tabular}{p{0.20\linewidth}p{0.5\linewidth}}
+            Sponsor: & The University of Sydney \\
+            Registration: & CTC0312 \\
+            Study Co-Chairs: & Professor Meg Jardine \\
+            & Professor Vivekanand Jha
+        \end{tabular}}
+    \end{center}
+\end{titlepage}
 \makeatother
 \thispagestyle{empty}
 \newpage
@@ -92,8 +108,7 @@ The aim of this study is to evaluate the safety and efficacy of dual treatment w
 
 \clearpage
 
-%% so footnote doesn't appear in ToC
-\section[Study Design]{Study Design\protect\footnote{from study protocol}}
+\section{Study Design}
 CLARITY 2.0 is a prospective, Multi-Centre, Multi-Arm Multi-Stage Randomised, Double Blind, Placebo Controlled Trial, utilising adaptive sample size re-estimation. Stage 1 will include 80 patients for a Phase II safety analysis to be conducted in India. Stage 2 will include 520 participants for review of preliminary efficacy data. Expansion to Stage 3, a full Phase III study, will be subject to review of accumulated data in Stage 1 and Stage 2.
 
 Protocol Stage 1 will be conducted in India only. The rest of the world will initiate the study in Stage 2 regardless of the recruitment status of the Stage 1. Recruitment in India will not continue to Stage 2 until completion of the Stage 1 safety analysis and review and approval of the Indian Central Drugs Standard Control Organization Subject Expert Committee on COVID-19 related proposals.
@@ -105,7 +120,6 @@ Participants must meet all the inclusion criteria, and none of the exclusion cri
 Adults with laboratory-confirmed diagnosis of SARS-CoV-2 infection intended for hospital admission for management of COVID-19.
 
 \subsubsection{Eligibility}
-
 \textbf{Inclusion criteria:}
 \begin{itemize}
     \item Adults aged between 18 and 65 years.
@@ -123,12 +137,12 @@ Adults with laboratory-confirmed diagnosis of SARS-CoV-2 infection intended for 
     \item Intolerance of ARBs
     \item Serum potassium >5.5 mmol/L
     \item An estimated Glomerular Filtration Rate (eGFR) <30ml/min/1.732m
-    \item Known biliary obstruction, known severe hepatic impairment (Child-Pugh-Turcotte score 10-15)
+    \item Known biliary obstruction, known severe hepatic impairment (a Child-Pugh-Turcotte score 10-15)
     \item Pregnancy, lactation, or inadequate contraception.
-    \begin{itemize}
-        \item Female participants must be either post-menopausal, infertile or use a reliable means of contraception for during the treatment period and for at least 60 days after the last dose of investigational product or refrain. Where they are of childbearing potential, female participants must also have a negative pregnancy test result within 7 days prior to randomisation.
-        \item Male participants must have been surgically sterilised or use a (double if required) barrier method of contraception during the treatment period and for at least 60 days after the last dose of investigational product or refrain from donating sperm during this period.
-    \end{itemize}
+          \begin{itemize}
+              \item Female participants must be either post-menopausal, infertile or use a reliable means of contraception for during the treatment period and for at least 60 days after the last dose of investigational product or refrain. Where they are of childbearing potential, female participants must also have a negative pregnancy test result within 7 days prior to randomisation.
+              \item Male participants must have been surgically sterilised or use a (double if required) barrier method of contraception during the treatment period and for at least 60 days after the last dose of investigational product or refrain from donating sperm during this period.
+          \end{itemize}
     \item Participation in a study of a novel investigational product within 28 days prior to randomisation.
     \item Plans to participate in another study of a novel investigational product during this study.
 \end{itemize}
@@ -215,13 +229,21 @@ The following characteristics will be described separately for patients randomis
 \begin{itemize}
     \item age at randomisation
     \item sex
+    \item ethnicity
+    \item weight
+    \item height
+    \item smoking history
+    \item comorbidities
+    \item concomitant medications
+    \item recent blood test results
 \end{itemize}
+In general, discrete data will be summarised by counts and proportions. Continuous variables will be summarised by median, lower quartile, upper quartile, minimum and maximum, or where appropriate, by mean and standard deviation. Counts and proportions of missing baseline values will be reported.
 
 \subsection{Completeness of Follow-up}
-The number and percentage of participants with follow-up information at day 14 and at day 28 post randomisation will be reported.
+The number and percentage of participants with follow-up information at day 14 and at day 28 post randomisation will be reported. Patterns of missingness will be summarised for primary and secondary outcomes.
 
 \subsection{Treatment Adherence}
-The number and proportion of patients who did not receive the treatment they were allocated to will be reported (if any). Concomitant medications received during the treatment period will be reported. Details on the number of days/doses of treatment received will be reported for each arm.
+The number and proportion of patients who did not receive the treatment they were allocated to will be reported (if any). Concomitant medications received during the treatment period will be reported. Details on the number of days/doses of treatment received will be reported for each arm and compared with the treatment protocol.
 
 \clearpage
 
@@ -229,7 +251,7 @@ The number and proportion of patients who did not receive the treatment they wer
 
 For all outcomes, the primary analyses will be performed on the intention to treat population at the specified number of days after randomisation. Pairwise comparisons will be made between the investigational arm and each control arm.
 
-For all models, any baseline covariates included for adjustment will be mean-centred where appropriate, and the treatment design will use orthonormal contrasts such that intercepts represent the outcome distribution amongst average patients assuming equal weighting across all treatment groups.
+For all models, any baseline covariates included for adjustment will be mean-centred where appropriate, and the treatment design (denoted by $x$) will use orthonormal contrasts such that intercepts represent the outcome distribution amongst average patients assuming equal weighting across all treatment groups.
 
 \subsection{Primary Outcome}
 The clinical health status at day 14 will be summarised by counts and proportions of patients within each outcome level by study arm. The following Bayesian cumulative logistic regression model will be updated using the available data.
@@ -240,7 +262,7 @@ $$
         \eta_{ik}                                  & = \alpha_k + x_i^{\mathsf{T}}\beta + \cdots \\
         \pi_k(x)                                   & = \begin{cases}
             1 - \text{logit}^{-1}(\alpha_1 + x^\mathsf{T}\beta)                                                       & k=1               \\
-            \text{logit}^{-1}(\alpha_{k-2} + x^\mathsf{T}\beta) - \text{logit}^{-1}(\alpha_{k-1} + x^\mathsf{T}\beta) & k\in\{2,...,K-1\} \\
+            \text{logit}^{-1}(\alpha_{k-1} + x^\mathsf{T}\beta) - \text{logit}^{-1}(\alpha_{k} + x^\mathsf{T}\beta) & k\in\{2,...,K-1\} \\
             \text{logit}^{-1}(\alpha_{K-1} + x^\mathsf{T}\beta)                                                       & k=K
         \end{cases},
     \end{aligned}
@@ -265,12 +287,12 @@ The analysis will be analagous to that for clinical health score at day 14, but 
 The number and proportion of patients with an any ICU admission in days 0 to 28 will be reported. The total number of ICU admissions, and number of patients with more than 1 will be reported. The following Bayesian negative binomial model will be updated using the available data.
 $$
     \begin{aligned}
-        y_i|\mu_i,r &\sim \text{Negative-Binomial}(\mu_i, r) \\
-        \mu_i &= \exp(\eta_i) \\
-        \eta_i | \alpha, \beta; x_i &\sim \alpha + x_i^\mathsf{T}\beta + \cdots \\
-        \alpha &\sim t_3(\ln(4), 2.5) \quad \text{(weakly informed)} \\
-        \beta &\overset{\text{iid}}{\sim} \text{Normal}(0, 10) \\
-        r &\sim \text{Half-Cauchy}(0, 10)
+        y_i|\mu_i,r                 & \sim \text{Negative-Binomial}(\mu_i, r)              \\
+        \mu_i                       & = \exp(\eta_i)                                       \\
+        \eta_i | \alpha, \beta; x_i & \sim \alpha + x_i^\mathsf{T}\beta + \cdots           \\
+        \alpha                      & \sim t_3(\ln(4), 2.5) \quad \text{(weakly informed)} \\
+        \beta                       & \overset{\text{iid}}{\sim} \text{Normal}(0, 10)      \\
+        r                           & \sim \text{Half-Cauchy}(0, 10)
     \end{aligned}
 $$
 
@@ -289,7 +311,7 @@ with priors
 $$
     \begin{aligned}
         \alpha & \sim \text{Normal}(\text{logit}(0.1), 1) \quad \text{(weakly informed by CLARITY 1)} \\
-        \beta &\overset{\text{iid}}{\sim} \text{Normal}(0, 1),
+        \beta  & \overset{\text{iid}}{\sim} \text{Normal}(0, 1),
     \end{aligned}
 $$
 where the $\alpha$ is the probability of death on average across all treatment groups.
@@ -302,7 +324,7 @@ This outcome will be analysed analgously to the death outcome. However, the foll
 $$
     \begin{aligned}
         \alpha & \sim \text{Normal}(?, 1) \quad \text{(weakly informed by CLARITY 1)} \\
-        \beta &\overset{\text{iid}}{\sim} \text{Normal}(0, 1).
+        \beta  & \overset{\text{iid}}{\sim} \text{Normal}(0, 1).
     \end{aligned}
 $$
 
@@ -313,7 +335,7 @@ This outcome will be analysed analgously to the death outcome. However, the foll
 $$
     \begin{aligned}
         \alpha & \sim \text{Normal}(?, 1) \quad \text{(weakly informed by CLARITY 1)} \\
-        \beta &\overset{\text{iid}}{\sim} \text{Normal}(0, 1).
+        \beta  & \overset{\text{iid}}{\sim} \text{Normal}(0, 1).
     \end{aligned}
 $$
 
@@ -323,12 +345,12 @@ $$
 Descriptive summary... The following Bayesian zero-truncated (ZT) (assuming only days 1 to 28 are valid outcome values) negative binomial model will be updated using the available data.
 $$
     \begin{aligned}
-        y_i|\mu_i,r &\sim \text{ZT-Negative-Binomial}(\mu_i, r) \\
-        \mu_i &= \exp(\eta_i) \\
-        \eta_i | \alpha, \beta; x_i &\sim \alpha + x_i^\mathsf{T}\beta + \cdots \\
-        \alpha &\sim t_3(\ln(4), 2.5) \quad \text{(weakly informed)} \\
-        \beta &\overset{\text{iid}}{\sim} \text{Normal}(0, 10) \\
-        r &\sim \text{Half-Cauchy}(0, 10).
+        y_i|\mu_i,r                 & \sim \text{ZT-Negative-Binomial}(\mu_i, r)           \\
+        \mu_i                       & = \exp(\eta_i)                                       \\
+        \eta_i | \alpha, \beta; x_i & \sim \alpha + x_i^\mathsf{T}\beta + \cdots           \\
+        \alpha                      & \sim t_3(\ln(4), 2.5) \quad \text{(weakly informed)} \\
+        \beta                       & \overset{\text{iid}}{\sim} \text{Normal}(0, 10)      \\
+        r                           & \sim \text{Half-Cauchy}(0, 10).
     \end{aligned}
 $$
 
