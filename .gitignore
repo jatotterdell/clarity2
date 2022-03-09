@@ -7,7 +7,7 @@
 .Rapp.history
 
 # Session Data files
-.RData
+*.RData
 
 # User-specific files
 .Ruserdata
@@ -20,6 +20,9 @@
 
 # RStudio files
 .Rproj.user/
+
+*.rdb
+*.rdx
 
 #+========================+
 # Directories
