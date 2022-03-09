@@ -14,6 +14,15 @@
 
 \renewcommand\pagemark{{\usekomafont{pagenumber}\thepage\ of \pageref{LastPage}}}
 
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={CLARITY 2 -  Statistical Analysis Plan},
+    pdfpagemode=FullScreen,
+    }
+
 % Setup header
 \automark*{section}
 \clearpairofpagestyles
@@ -57,11 +66,11 @@
         {\large Version 0.1}\\[2ex]
         {\large \@date}\\[10ex]
         \fbox{\begin{tabular}{p{0.20\linewidth}p{0.5\linewidth}}
-            Sponsor: & The University of Sydney \\
-            Registration: & CTC0312 \\
-            Study Co-Chairs: & Professor Meg Jardine \\
-            & Professor Vivekanand Jha
-        \end{tabular}}
+                Sponsor:         & The University of Sydney \\
+                Registration:    & CTC0312                  \\
+                Study Co-Chairs: & Professor Meg Jardine    \\
+                                 & Professor Vivekanand Jha
+            \end{tabular}}
     \end{center}
 \end{titlepage}
 \makeatother
@@ -148,23 +157,29 @@ Adults with laboratory-confirmed diagnosis of SARS-CoV-2 infection intended for 
 \end{itemize}
 
 \subsection{Interventions}
-\textbf{Investigational arm:} Titratable candesartan with commencing dose 4mg tablets twice daily (daily dose 8 mg) + fixed dose repagermanium one x 120mg immediate release capsule twice daily (total daily dose 240mg).
+\textbf{Investigational arm (C+R):} Titratable candesartan with commencing dose 4mg tablets twice daily (daily dose 8 mg) + fixed dose repagermanium one x 120mg immediate release capsule twice daily (total daily dose 240mg).
 
-\textbf{Control arm \#1:} Titratable candesartan with commencing dose 4mg tablets twice daily (daily dose 8 mg) + matched placebo repagermanium one capsule twice daily.
+\textbf{Control arm \#1 (C+P):} Titratable candesartan with commencing dose 4mg tablets twice daily (daily dose 8 mg) + matched placebo repagermanium one capsule twice daily.
 
-\textbf{Control arm \#2:}  Titratable matched placebo candesartan
+\textbf{Control arm \#2 (P+P):}  Titratable matched placebo candesartan
 one tablet twice daily + matched placebo repagermanium one capsule twice daily.
 
 Treatment for will continue for 28 days.
 
 \subsection{Randomisation}
-Initially, treatment allocation will be with a 1:1 randomisation between two arms in Stage 1, and a 1:1:1 block randomisation between three arms in Stage 2, stratified by centre.
+For stage 1, treatment allocation will be 1:1 randomisation via block randomisation stratified by centre between the investigational arm (C+R) and control arm 1 (C+P). 
+
+Following stage 1, in stage 2 the three arms will be randomised 1:1:1 using block randomisation stratified by centre.
 
 \subsection{Blinding}
 The packaging and labelling of interventions will be designed to maintain blinding to the study team and to participants (double-blind).
 
 \subsection{Sample Size}
-Stage 1 of the trial will recruit 80 participants from India for a safety analysis. Stage 2 of the trial will recruit an additional 520 participants. Information from other relevant trials will be utilised to inform the decision for dropping one of the two control arms.
+Stage 1 of the trial will recruit 80 participants from India for a safety analysis. 
+
+Stage 2 of the trial will recruit an additional 520 participants. Information from other relevant trials will be utilised to inform the decision for dropping one of the two control arms.
+
+Progression to stage 3 will be subject to review of the combined stage 1 and stage 2 data.
 
 \subsection{Data Collection}
 
@@ -243,27 +258,137 @@ In general, discrete data will be summarised by counts and proportions. Continuo
 The number and percentage of participants with follow-up information at day 14 and at day 28 post randomisation will be reported. Patterns of missingness will be summarised for primary and secondary outcomes.
 
 \subsection{Treatment Adherence}
-The number and proportion of patients who did not receive the treatment they were allocated to will be reported (if any). Concomitant medications received during the treatment period will be reported. Details on the number of days/doses of treatment received will be reported for each arm and compared with the treatment protocol.
+The number and proportion of patients who did not receive the treatment they were allocated to will be reported (if any). Concomitant medications received during the treatment period will be reported. Details on the number of days/doses of treatment received will be reported for each arm and compared with the treatment protocol. The number and proportion of participants who discontinued treatment and the reasons for discontinuation as specified in the protocol will be reported.
 
 \clearpage
 
 \section{Comparative Analyses}
 
-For all outcomes, the primary analyses will be performed on the intention to treat population at the specified number of days after randomisation. Pairwise comparisons will be made between the investigational arm and each control arm.
+Pairwise comparisons will be made between the investigational arm and each control arm. For all outcomes, the primary analyses will be performed with treatment groups as assigned by randomisation (de facto estimand) irrespective of treatment withdrawal or failure to comply with the protocol.
 
-For all models, any baseline covariates included for adjustment will be mean-centred where appropriate, and the treatment design (denoted by $x$) will use orthonormal contrasts such that intercepts represent the outcome distribution amongst average patients assuming equal weighting across all treatment groups.
+For all models, any baseline covariates included for adjustment will be mean-centred where appropriate, and the treatment design (denoted by $x$) will use orthonormal contrasts such that intercepts represent the outcome distribution amongst "average" patients assuming equal weighting across all treatment groups.
 
-\subsection{Primary Outcome}
-The clinical health status at day 14 will be summarised by counts and proportions of patients within each outcome level by study arm. The following Bayesian cumulative logistic regression model will be updated using the available data.
+\subsection{Intercurrent Events}
+
+For most analyses, the only intercurrent event (ICE) of concern is death. In most cases, this ICE is handled by the use of composite outcomes where death is assigned the worst possible score of the outcome on the ordinal scale. For other intercurrent events (e.g. treatment switching/withdrawal) the treatment policy strategy will be used with treatment groups analysed as assigned irrespective of withdrawal from or discontinuation of the assigned treatment.
+
+\subsection{Primary Outcome}\label{sec:primary-outcome-analysis}
+The clinical health status at day 14 will be summarised by counts and proportions of patients within each outcome level by study arm (i.e. the distribution of outcome levels). The following Bayesian cumulative logistic regression model will be updated using the available data.
 $$
     \begin{aligned}
         y_{i} | \pi;x_i                            & \sim \text{Categorical}(\pi(x_i))           \\
         \mathbb P(y_i \leq k | \alpha, \beta; x_i) & = \text{logit}^{-1}(\eta_{ik})              \\
         \eta_{ik}                                  & = \alpha_k + x_i^{\mathsf{T}}\beta + \cdots \\
         \pi_k(x)                                   & = \begin{cases}
-            1 - \text{logit}^{-1}(\alpha_1 + x^\mathsf{T}\beta)                                                       & k=1               \\
+            1 - \text{logit}^{-1}(\alpha_1 + x^\mathsf{T}\beta)                                                     & k=1              \\
+            \text{logit}^{-1}(\alpha_{k-1} + x^\mathsf{T}\beta) - \text{logit}^{-1}(\alpha_{k} + x^\mathsf{T}\beta) & k\in\{2,...,13\} \\
+            \text{logit}^{-1}(\alpha_{13} + x^\mathsf{T}\beta)                                                      & k=14
+        \end{cases},
+    \end{aligned}
+$$
+with prior distributions
+$$
+    \begin{aligned}
+        \pi(0)          & \sim \text{Dirichlet}(\kappa)                          \\
+        \beta_1,\beta_2 & \sim \text{Normal}(0, 1)                               \\
+        \kappa          & = \cdots  \quad \text{(weakly informed by CLARITY 1)}.
+    \end{aligned}
+$$
+Due to the orthornormal design coding, the prior specified on $\pi(0)$ is the prior distribution on the outcome levels for an average patient with equal weighting given to each study arm, rather than the distribution of outcome levels for patients in the double placebo control group.
+
+The posterior distribution of each contrast will be reported along with posterior summaries: median and 95\% highest density credible interval.
+
+\subsection{Secondary Outcomes}
+
+\subsubsection{Clinical health score at day 28}
+The analysis will be analagous to that for clinical health score at day 14 (\ref{sec:primary-outcome-analysis}), but with a different prior. The prior is weakly informed by CLARITY 1 outcome data. For this outcome we specify
+$$
+    \kappa = \cdots
+$$
+for the hyper-parameter on the prior for $\pi(0)$.
+
+\subsubsection{ICU admission (incidence days 0 - 28)}\label{sec:icu-analysis}
+
+\textbf{Participants who die without ICU admission? Just $\mathbf{y_i=0}$? Or define as ordinal outcome with 0 - no ICU, 1 - ICU, 2 - Death? Or if die without ICU, just include as 0?}
+
+The number and proportion of patients with an any ICU admission in days 0 to 28 will be reported.The following Bayesian logistic regression model will be updated using the available data.
+$$
+    \begin{aligned}
+        y_i|\pi_i & \sim \text{Bernoulli}(\pi_i)   \\
+        \pi_i     & = \text{logit}^{-1}(\eta_i)    \\
+        \eta_i    & = \alpha + x_i^\mathsf{T}\beta
+    \end{aligned}
+$$
+with priors
+$$
+    \begin{aligned}
+        \alpha & \sim \text{Logistic}(\mu_\alpha, 1)            \\
+        \beta  & \overset{\text{iid}}{\sim} \text{Normal}(0, 1)
+    \end{aligned}
+$$
+where $\mu_\alpha$ is informed by CLARITY 1.
+
+\subsubsection{Death (incidence days 0 - 28)}
+This outcome will be analysed analgously to the ICU incidence outcome (\ref{sec:icu-analysis}). However, the following priors will instead be specified
+$$
+    \alpha \sim \text{Logistic}(?, 1) \quad \text{(weakly informed by CLARITY 1)}.
+$$
+
+\subsubsection{Time to death (from randomisation)}
+Time to death will be censored at either the end of follow-up (\textbf{Protocol doesn't mention this explicitly, but I'm assuming death will be identified up to 180 days post-randomisation}) or in the case of loss-to-follow-up, at the last study day on which the participant was known to be alive.
+
+Kaplan-Meier curves for time to death will be presented by treatment group. Time to death will be analysed a proportional hazards model. The baseline hazard will be modelled flexibly using M-splines.
+
+Let $D_i = (y_i, \nu_i)$ denote the data for subject $i$ where $y_i$ is the event time and $\nu_i$ and indicator for censoring or observation of the event. The model for the hazard is
+$$
+    \begin{aligned}
+        \lambda(t|\beta;x) & = \lambda_0(t)\exp(x^\mathsf{T}\beta)                           \\
+        \lambda_0(t)       & = \sum_{l=1}^L M_l(t;\tau)\gamma_l,\quad \sum_{l=1}^L\gamma_l=1 \\
+        \eta_i             & = x_i^\mathsf{T}\beta                                           \\
+        \lambda_i(y_i)     & = \lambda_0(y_i)\exp(\eta_i)                                    \\
+    \end{aligned}
+$$
+where $M_l(t;\tau)$ is the $l$th basis term for a M-spline of degree 3 with knots at locations $\tau=\{\tau_1,...,\tau_{L+4}\}$ evaluated at $t$. The default not location will be at the quantiles of observed event times. If this is determined to be inappropriate (too few events, insufficient flexible etc.) then an alternative may be specified.
+
+The contrasts of interest will be the hazard ratio of the intervention group relative to each of the control groups.
+
+If there is clear departure from proportional hazards assumption, then the treatment effect parameters $\beta$ may be allowed to vary with time rather than a time-invariant effect. In this case, restricted mean survival time will be the comparison of interest.
+
+\subsubsection{Acute kidney injury (incidence in days 0 - 28)}
+This outcome will be analysed analgously to the ICU incidence outcome (\ref{sec:icu-analysis}). However, the following priors will instead be specified
+$$
+    \alpha \sim \text{Logistic}(?, 1) \quad \text{(weakly informed by CLARITY 1)}.
+$$
+
+\subsubsection{Respiratory failure (incidence in days 0 - 28)}
+This outcome will be analysed analgously to the ICU incidence outcome (\ref{sec:icu-analysis}). However, the following priors will instead be specified
+$$
+    \alpha \sim \text{Logistic}(?, 1) \quad \text{(weakly informed by CLARITY 1)}.
+$$
+
+\subsubsection{Length of hospital admission (days of inpatient stay from admission to discharge or death)}
+
+\textbf{Death as a competing risk for time-to-discharge. Multi-state model hospitalised -> discharge -> death, hospitalised -> death. Protocol doesn't specify censoring time for this, again assuming 180 days (last day of follow-up).}
+
+A multi-state hazard model...
+
+\subsubsection{Length of ICU admission (days in ICU from admission to transfer to ward or death)}
+Negative binomial may need to be zero-adjusted, i.e. probability of any ICU admission, then conditional on admission, the number of days. Model selection, i.e. fit NB and ZA-NB and assess model fit.
+
+\subsubsection{Requirement of ventilatory support (number of days with ventilation in days 0 - 28)}\label{sec:vent-support}
+
+\textbf{What about deaths? Code as worst outcome, i.e. 28 days? What about people who die without requiring any dialysis? Are they the same as someone dying and requiring 28 days with dialysis?}
+
+Counts and distributions of the outcome will be summarised by treatment group. A cumulative logistic proportional odds model will be assumed. If $y_i\in\{0,1,...,28,29\}$ denotes the number of days with ventilatory support (where 0 means 0 days, and 29 corresponds with death) for participant $i$, and $x_i$ the intervention design covariates, then
+$$
+    \begin{aligned}
+        y_{i} | \pi;x_i                            & \sim \text{Categorical}(\pi(x_i))           \\
+        \mathbb P(y_i \leq k | \alpha, \beta; x_i) & = \text{logit}^{-1}(\eta_{ik})              \\
+        \eta_{ik}                                  & = \alpha_k + x_i^{\mathsf{T}}\beta + \cdots \\
+        \pi_k(x)                                   & = \begin{cases}
+            1 - \text{logit}^{-1}(\alpha_1 + x^\mathsf{T}\beta)                                                     & k=0               \\
             \text{logit}^{-1}(\alpha_{k-1} + x^\mathsf{T}\beta) - \text{logit}^{-1}(\alpha_{k} + x^\mathsf{T}\beta) & k\in\{2,...,K-1\} \\
-            \text{logit}^{-1}(\alpha_{K-1} + x^\mathsf{T}\beta)                                                       & k=K
+            \text{logit}^{-1}(\alpha_{K-1} + x^\mathsf{T}\beta)                                                     & k=29
         \end{cases},
     \end{aligned}
 $$
@@ -274,121 +399,80 @@ $$
         \beta_1,\beta_2 & \sim \text{Normal}(0, 1).
     \end{aligned}
 $$
-Due to the orthornormal design coding, the prior specified on $\pi(0)$ is the prior distribution on the outcome levels for an average patient with equal weighting given to each study arm, rather than the distribution of outcome levels for patients in the double placebo control group.
+The primary contrasts will be the relative log-odds of having a worse outcome (higher outcome level) in the investigational arm compared to each of the contorl arms.
 
-The posterior distribution of each contrast will be reported along with posterior summaries: median and 95\% credible interval.
-
-\subsection{Secondary Outcomes}
-
-\subsubsection{Clinical health score at day 28}
-The analysis will be analagous to that for clinical health score at day 14, but with a different prior. The prior...
-
-\subsubsection{ICU admission (incidence days 0 - 28)}
-The number and proportion of patients with an any ICU admission in days 0 to 28 will be reported. The total number of ICU admissions, and number of patients with more than 1 will be reported. The following Bayesian negative binomial model will be updated using the available data.
-$$
-    \begin{aligned}
-        y_i|\mu_i,r                 & \sim \text{Negative-Binomial}(\mu_i, r)              \\
-        \mu_i                       & = \exp(\eta_i)                                       \\
-        \eta_i | \alpha, \beta; x_i & \sim \alpha + x_i^\mathsf{T}\beta + \cdots           \\
-        \alpha                      & \sim t_3(\ln(4), 2.5) \quad \text{(weakly informed)} \\
-        \beta                       & \overset{\text{iid}}{\sim} \text{Normal}(0, 10)      \\
-        r                           & \sim \text{Half-Cauchy}(0, 10)
-    \end{aligned}
-$$
-
-\textbf{NOTE: assuming this could possible occur more than once per participant, i.e. incidence, other-wise just binomial regression.}
-
-\subsubsection{Death (incidence days 0 - 28)}
-The number and proportion of deaths will be summarised by treatment arm. The following Bayesian logistic regression model will be updated using the available data.
-$$
-    \begin{aligned}
-        y_i | \pi_i              & \sim \text{Bernoulli}(\pi_i)    \\
-        \pi_i                    & = \text{logit}^{-1}(\eta_i)     \\
-        \eta_i|\alpha,\beta; x_i & = \alpha + x_i^\mathsf{T}\beta,
-    \end{aligned}
-$$
-with priors
-$$
-    \begin{aligned}
-        \alpha & \sim \text{Normal}(\text{logit}(0.1), 1) \quad \text{(weakly informed by CLARITY 1)} \\
-        \beta  & \overset{\text{iid}}{\sim} \text{Normal}(0, 1),
-    \end{aligned}
-$$
-where the $\alpha$ is the probability of death on average across all treatment groups.
-
-\subsubsection{Time to death (assessed from hospital admission)}
-
-
-\subsubsection{Acute kidney injury (incidence in days 0 - 28)}
-This outcome will be analysed analgously to the death outcome. However, the following priors will instead be specified.
-$$
-    \begin{aligned}
-        \alpha & \sim \text{Normal}(?, 1) \quad \text{(weakly informed by CLARITY 1)} \\
-        \beta  & \overset{\text{iid}}{\sim} \text{Normal}(0, 1).
-    \end{aligned}
-$$
-
-\textbf{NOTE: assuming this is likely to only occur once, i.e. binary, other-wise negative-binomial.}
-
-\subsubsection{Respiratory failure (incidence in days 0 - 28)}
-This outcome will be analysed analgously to the death outcome. However, the following priors will instead be specified.
-$$
-    \begin{aligned}
-        \alpha & \sim \text{Normal}(?, 1) \quad \text{(weakly informed by CLARITY 1)} \\
-        \beta  & \overset{\text{iid}}{\sim} \text{Normal}(0, 1).
-    \end{aligned}
-$$
-
-\textbf{NOTE: assuming this is likely to only occur once, i.e. binary, otherwise, negative-binomial.}
-
-\subsubsection{Length of hospital admission (days of inpatient stay from admission to discharge or death)}
-Descriptive summary... The following Bayesian zero-truncated (ZT) (assuming only days 1 to 28 are valid outcome values) negative binomial model will be updated using the available data.
-$$
-    \begin{aligned}
-        y_i|\mu_i,r                 & \sim \text{ZT-Negative-Binomial}(\mu_i, r)           \\
-        \mu_i                       & = \exp(\eta_i)                                       \\
-        \eta_i | \alpha, \beta; x_i & \sim \alpha + x_i^\mathsf{T}\beta + \cdots           \\
-        \alpha                      & \sim t_3(\ln(4), 2.5) \quad \text{(weakly informed)} \\
-        \beta                       & \overset{\text{iid}}{\sim} \text{Normal}(0, 10)      \\
-        r                           & \sim \text{Half-Cauchy}(0, 10).
-    \end{aligned}
-$$
-
-\textbf{NOTES: A potential concern is the possibility for an inflated number of patients with either 1 day or 28 days in hospital. So rather than negative-binomial, an inflation-adjusted model may be more appropriate. Additionally, it is not ideal to treat 2 days in hospital followed by death and 2 days in hospital followed by discharge as equivalent. Could consider number of days alive and free from hospital, with death treated as 0 days. However, this would be a different endpoint, and the specification above is for the defined endpoint.}
-
-\subsubsection{Length of ICU admission (days in ICU from admission to transfer to ward or death)}
-Negative binomial may need to be zero-adjusted, i.e. probability of any ICU admission, then conditional on admission, the number of days. Model selection, i.e. fit NB and ZA-NB and assess model fit.
-
-\subsubsection{Requirement of ventilatory support (number of days with ventilation in days 0 - 28)}
-Negative binomial, may need to be zero-adjusted, i.e. probability of any ventilation, then conditional on requiring ventilation the number of days. Model selection, i.e. fit NB and ZA-NB and assess model fit.
+Outcome levels with at least 1 observation will be modelled as is. Outcome levels with 0 observations will be excluded from the model.
 
 \subsubsection{Requirement of dialysis (number of days with dialysis in days 0 - 28)}
-Negative binomial, may need to be zero-adjusted, i.e. probability of any dialysis, then conditional on requiring dialysis the number of days. Model selection, i.e. fit NB and ZA-NB and assess model fit.
+
+This outcome will be analysed analgously to \ref{sec:vent-support} but with prior hyper-parameter
+$$
+    \kappa = \cdot \quad \text{(weakly informed by CLARITY 1)}
+$$
+for $\pi(0)$.
 
 \subsubsection{Clinical health score at day 60}
-The analysis will be analagous to that for clinical health score at day 14, but with a different prior on the outcome distribution. The prior...
+The analysis will be analagous to that for clinical health score at day 14 (\ref{sec:primary-outcome-analysis}), but with a different prior. The prior is weakly informed by CLARITY 1 outcome data. For this outcome we specify
+$$
+    \kappa = \cdots
+$$
+for the hyper-parameter on the prior for $\pi(0)$.
 
 \subsubsection{Clinical health score at day 90}
-The analysis will be analagous to that for clinical health score at day 14, but with a different prior on the outcome distribution. The prior...
+The analysis will be analagous to that for clinical health score at day 14 (\ref{sec:primary-outcome-analysis}), but with a different prior. The prior is weakly informed by CLARITY 1 outcome data. For this outcome we specify
+$$
+    \kappa = \cdots
+$$
+for the hyper-parameter on the prior for $\pi(0)$.
 
 \subsubsection{Clinical health score at day 180}
-The analysis will be analagous to that for clinical health score at day 14, but with a different prior on the outcome distribution. The prior...
+The analysis will be analagous to that for clinical health score at day 14 (\ref{sec:primary-outcome-analysis}), but with a different prior. The prior is weakly informed by CLARITY 1 outcome data. For this outcome we specify
+$$
+    \kappa = \cdots
+$$
+for the hyper-parameter on the prior for $\pi(0)$.
+
+\subsection{Safety Outcomes}
+
+For safety outcomes the number (and proportion) of participants experiencing the event of interest (hypotension, hyperkalaemia, deranged liver function, SAEs) and the total number (and rate) of events will be reported by treatment arm.
+
 
 \subsection{Baseline Adjustments}
-As randomisation is stratified by centre, all models will include centre as a random effect.
+As randomisation is stratified by centre, all models will include centre as a random effect. The effect of centre will be assumed additive in the linear predictor and will be modelled by
+$$
+    \begin{aligned}
+        \gamma_j|\tau & \sim \text{Normal}(0, \tau^2), \quad j =1,...,J \\
+        \tau          & \sim \text{Cauchy}(0, 2.5).
+    \end{aligned}
+$$
 
 \subsection{Subgroup Analyses}
 No pre-specified subgroup analyses are planned.
 
 \subsection{Missing Data}
+Patterns of missing baseline and outcome data will be reported by treatment group.
 
+Where other sources of information are available, missing baseline variables may be imputed deterministically. Missing outcomes may be treated as censored if appropriate (e.g. if a participant was known to be alive at day 14, but their exact status was unknown then their outcome is interval censored in $\{1,...,7\}$) or if they were known to be out of hospital but with unknown not-hospitalised status then their outcome is interval censored in $\{1,2\}$).
+
+Baseline predictors of missingness will be investigated. In the absence of strong predictors of missingness, the default analysis will be based on available cases adjusting for the pre-specified covariates. Alternatively, missing outcomes may be multiply imputed using an expanded set of baseline covariates.
 
 \subsection{Software}
-The statistical software R will be used and Bayesian models will be updated from the data using Stan.
+The statistical software R will be used for data processing. Bayesian model posteriors will be approximated using HMC as implemented in Stan. Program and package versions used for the analyses will be reported.
 
 \clearpage
 
-\section{Interim Analyses and Trial Reporting}
+\section{Trial Monitoring and Reporting}
 
+Analyses are planned to occur at the following stages of recruitment:
+
+\begin{itemize}
+    \item Safety analysis after 80 particiants randomsied 1:1 to ...
+    \item Effectiveness analysis after an additional 520 participants randomised 1:1:1 to
+    \item Effectiveness analysis after every additional 600 participants up to the maximum sample size of 2,100 participants.
+\end{itemize}
+
+At each analysis, the investigational arm will be compared with both control arms with respect to the primary outcome.
+
+\subsection{Decision Rules}
 
 \end{document}
