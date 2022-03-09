@@ -1,3 +1,7 @@
+#+========================+
+# R files
+#+========================+
+
 # History files
 .Rhistory
 .Rapp.history
@@ -16,3 +20,40 @@
 
 # RStudio files
 .Rproj.user/
+
+#+========================+
+# Directories
+#+========================+
+.vscode/
+
+
+#+========================+
+# LaTeX files
+##+========================+
+*.acn
+*.acr
+*.alg
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.dvi
+*.fdb*
+*.fls
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.lot
+*.maf
+*.mtc
+*.mtc1
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
