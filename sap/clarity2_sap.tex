@@ -167,7 +167,7 @@ one tablet twice daily + matched placebo repagermanium one capsule twice daily.
 Treatment for will continue for 28 days.
 
 \subsection{Randomisation}
-For stage 1, treatment allocation will be 1:1 randomisation via block randomisation stratified by centre between the investigational arm (C+R) and control arm 1 (C+P). 
+For stage 1, treatment allocation will be 1:1 randomisation via block randomisation stratified by centre between the investigational arm (C+R) and control arm 1 (C+P).
 
 Following stage 1, in stage 2 the three arms will be randomised 1:1:1 using block randomisation stratified by centre.
 
@@ -175,7 +175,7 @@ Following stage 1, in stage 2 the three arms will be randomised 1:1:1 using bloc
 The packaging and labelling of interventions will be designed to maintain blinding to the study team and to participants (double-blind).
 
 \subsection{Sample Size}
-Stage 1 of the trial will recruit 80 participants from India for a safety analysis. 
+Stage 1 of the trial will recruit 80 participants from India for a safety analysis.
 
 Stage 2 of the trial will recruit an additional 520 participants. Information from other relevant trials will be utilised to inform the decision for dropping one of the two control arms.
 
@@ -401,7 +401,7 @@ $$
 $$
 The primary contrasts will be the relative log-odds of having a worse outcome (higher outcome level) in the investigational arm compared to each of the contorl arms.
 
-Outcome levels with at least 1 observation will be modelled as is. Outcome levels with 0 observations will be excluded from the model.
+Outcome levels with at least 1 observation will be included in the model. If any outcome levels have 0 observations then these will be excluded from the model.
 
 \subsubsection{Requirement of dialysis (number of days with dialysis in days 0 - 28)}
 
@@ -454,7 +454,7 @@ Patterns of missing baseline and outcome data will be reported by treatment grou
 
 Where other sources of information are available, missing baseline variables may be imputed deterministically. Missing outcomes may be treated as censored if appropriate (e.g. if a participant was known to be alive at day 14, but their exact status was unknown then their outcome is interval censored in $\{1,...,7\}$) or if they were known to be out of hospital but with unknown not-hospitalised status then their outcome is interval censored in $\{1,2\}$).
 
-Baseline predictors of missingness will be investigated. In the absence of strong predictors of missingness, the default analysis will be based on available cases adjusting for the pre-specified covariates. Alternatively, missing outcomes may be multiply imputed using an expanded set of baseline covariates.
+Baseline predictors of missingness will be investigated. In the absence of strong predictors of missingness, the default analysis will be based on available cases adjusting for the pre-specified covariates. Alternatively, missing outcomes may be multiply imputed using an expanded set of baseline covariates and the combined results used for reporting.
 
 \subsection{Software}
 The statistical software R will be used for data processing. Bayesian model posteriors will be approximated using HMC as implemented in Stan. Program and package versions used for the analyses will be reported.
