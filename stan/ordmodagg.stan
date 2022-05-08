@@ -51,9 +51,9 @@ functions {
   // log-likelihood (multinomial)
   // - p: level probabilities for each pattern
   // - y: observed count for each level for each pattern
-  vector log_lik(matrix p, matrix y) {
-    int N = rows(y);
-    int K = cols(y);
+  vector log_lik(matrix p, array[,] int y) {
+    int N = dims(y)[1];
+    int K = dims(y)[2];
     vector[N] out;
     for(n in 1:N) {
       out[n] = 0.0;
@@ -69,10 +69,11 @@ data {
   int N; // number of records
   int K; // number of response levels
   int P; // number of covariates
-  matrix[N, K] y; // response record x level
+  array[N, K] int y; // response record x level
   matrix[N, P] X; // design matrix
   vector[K] prior_counts; // prior for Dirichlet on cuts
   vector[P] prior_sd; // prior SD for beta coefficients
+  int prior_only;
 }
 
 transformed data {
@@ -102,5 +103,13 @@ model {
   target += normal_lpdf(beta_raw | 0, 1);
   target += dirichlet_lpdf(pi | prior_counts);
   // Observational model
-  target += loglik;
+  if (!prior_only)
+    target += loglik;
+}
+
+generated quantities {
+  array[N, K] int yrep;
+  for (i in 1:N) {
+    yrep[i] = multinomial_rng(to_vector(p[i]), sum(y[i]));
+  }
 }

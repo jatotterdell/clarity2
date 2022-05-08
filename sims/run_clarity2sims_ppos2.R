@@ -48,11 +48,6 @@ ordmodat <- list(
 approxmod <- clarity2sims:::compile_rstan_approx_mod()
 mod <- list(ordmod, ordmodat, approxmod)
 
-# ----- PRNGs -----
-RNGkind("L'Ecuyer-CMRG")
-set.seed(791351)
-mc.reset.stream()
-
 # ----- Specify configurations to explore -----
 cfg <- CJ(
   sims = num_sims,
@@ -80,6 +75,11 @@ cfg <- CJ(
 # ----- Which configurations do we want to run? -----
 run_row <- seq_len(nrow(cfg))
 
+# ----- PRNGs -----
+RNGkind("L'Ecuyer-CMRG")
+seed <- 791351
+set.seed(seed)
+mc.reset.stream()
 
 # ----- Loop over configurations and save results -----
 for (z in run_row) {
@@ -98,6 +98,8 @@ for (z in run_row) {
       refresh = 0
     )
   }, mc.cores = num_cores)
+  # invisible(runif(1)) # step Global RNG stream forward
+  set.seed(seed) # use same seed for every configuration
 
   resl_alpha <- rbindlist(lapply(res, \(x) x[["alpha"]]), idcol = "trial")
   resl_contr <- rbindlist(lapply(res, \(x) x[["contr"]]), idcol = "trial")
