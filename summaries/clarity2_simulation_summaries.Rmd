@@ -257,7 +257,7 @@ post_dec <- post_ctr[, .(configuration, trial, analysis, variable, pr_ctr, i_ctr
 post_dec <- dcast(
   post_dec,
   configuration + trial + analysis + OR + eff_eps + K ~
-  variable,
+    variable,
   value.var = c("pr_ctr", "i_ctr", "ppos")
 )
 
@@ -286,20 +286,17 @@ stage2dec_tab <- dcast(stage2dec_summary[K == 4 & eff_eps == 0.95],
 )
 kable(stage2dec_tab,
   format = "latex",
-  col.names = c("OR (control 1, inv. arm)", rep(c("K = 4"), times = 3)),
+  col.names = c(
+    "OR (control 1, inv. arm)",
+    "Investigational\nvs control 1", "Investigational\nvs control 2", "Investigational\nvs both"
+  ),
   caption = "Proportion of trials reaching conclusion for effectiveness, $\\epsilon_{\\text{eff}}=0.95$.",
   digits = 2,
   booktabs = TRUE,
   align = "lrrrrrr",
   linesep = ""
 ) %>%
-  kable_styling(latex_options = "HOLD_position", font_size = 10) %>%
-  add_header_above(c(
-    " " = 1,
-    "Investigational\nvs control 1" = 1,
-    "Investigational\nvs control 2" = 1,
-    "Investigational\nvs both" = 1
-  ))
+  kable_styling(latex_options = "HOLD_position", font_size = 10)
 ```
 
 
@@ -313,7 +310,8 @@ ggplot(
   stat_ecdf(aes(x = ppos_3v1, colour = "PPoS"), pad = F) +
   scale_colour_manual("Quantity", values = c("Posterior probability" = "black", "PPoS" = "red")) +
   labs(x = "p", y = "eCDF(p)") +
-  ylim(0, 1) + xlim(0, 1) +
+  ylim(0, 1) +
+  xlim(0, 1) +
   theme(legend.position = "bottom")
 ```
 
