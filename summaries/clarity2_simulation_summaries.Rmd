@@ -39,6 +39,7 @@ library(Hmisc)
 library(data.table)
 library(ggplot2)
 library(patchwork)
+library(ggrepel)
 library(kableExtra)
 
 theme_set(
@@ -89,7 +90,7 @@ decide_futility <- function(trial_dat, eps_fut = 0.025) {
     analysis >= end, result
   )]
 
-  grid <- CJ(configuration = end$configuration, trial = end$trial, analysis = 1:6, unique = TRUE)
+  grid <- CJ(configuration = end$configuration, trial = end$trial, analysis = 1:max(trial_dat$analysis), unique = TRUE)
   ppos_stop_status <- end[grid, on = c("configuration", "trial")]
   ppos_stop_status[, status := fcase(
     analysis < end, "no result",
@@ -271,14 +272,16 @@ post_dec[, `:=`(
 
 ## Stage 2 
 
-At the end of stage 2 there will be 600 participants randomised between the three arms with approximately: 173 assigned to control arm 1, and 213/214 assigned to each of control arm 2 and the investigational arm. 
+At the end of stage 2 there will be 600 participants randomised between the three arms with approximately: 173 assigned to control arm 1, and 213/214 assigned to each of control arm 2 and the investigational arm.
+
+After 600 participants enrolled, ~40% of trials had the effectiveness when the investigational arm had odds 1.5 times both the control groups.
 
 ```{r stage-2}
 stage2dec <- post_ctr_wide[analysis == 1]
 stage2dec_summary <- stage2dec[, .(
   `3v1` = mean(i_ctr_3v1),
   `3v2` = mean(i_ctr_3v2),
-  `3v1and2` = mean(i_ctr_3v1and2)
+  `3v1and2` = mean(i_ctr_3v1 & i_ctr_3v2)
 ), keyby = .(K, OR, eff_eps)]
 stage2dec_tab <- dcast(stage2dec_summary[K == 4 & eff_eps == 0.95],
   OR ~ K,
@@ -286,17 +289,89 @@ stage2dec_tab <- dcast(stage2dec_summary[K == 4 & eff_eps == 0.95],
 )
 kable(stage2dec_tab,
   format = "latex",
-  col.names = c(
-    "OR (control 1, inv. arm)",
-    "Investigational\nvs control 1", "Investigational\nvs control 2", "Investigational\nvs both"
-  ),
+  col.names = linebreak(c(
+    "OR: ctrl. 2, inv. arm\n(relative to ctrl. 1)",
+    "Investigational\nvs control 1",
+    "Investigational\nvs control 2",
+    "Both\neffective"
+  ), align = "c"),
   caption = "Proportion of trials reaching conclusion for effectiveness, $\\epsilon_{\\text{eff}}=0.95$.",
+  escape = FALSE,
   digits = 2,
   booktabs = TRUE,
   align = "lrrrrrr",
   linesep = ""
 ) %>%
-  kable_styling(latex_options = "HOLD_position", font_size = 10)
+  kable_styling(
+    latex_options = "HOLD_position",
+    font_size = 9
+  )
+```
+
+
+```{r, fig.cap = "Distribution of PPoS for investigational arm vs control 1 at end of stage 2, n = 600.", fig.height=4, fig.width=6}
+stage2dec[
+  ,
+  ggplot(.SD, aes(ppos_3v1)) +
+    geom_histogram(binwidth = 0.05, boundary = 0) +
+    facet_wrap(~OR) +
+    labs(
+      x = "PPoS for investigational arm vs control 1",
+      y = "Frequency"
+    )
+]
+```
+
+
+```{r, fig.cap = "Distribution of PPoS for investigational arm vs control 1 and control 2 at end of stage 2, n = 600 across 10,000 trials.", fig.height=4, fig.width=6}
+ggplot(stage2dec, aes(ppos_3v1, ppos_3v2)) +
+  geom_bin_2d(aes(fill = ..ndensity.., colour = ..ndensity..), binwidth = 0.05) +
+  facet_wrap(~OR) +
+  labs(
+    x = "PPoS for investigational arm vs control 1",
+    y = "PPoS for investigational arm vs control 2",
+    fill = "Relative frequency",
+    colour = "Relative frequency"
+  ) +
+  scale_fill_viridis_c() +
+  scale_color_viridis_c() +
+  theme(panel.grid = element_blank())
+```
+
+
+```{r}
+fut_thres <- c(0, 0.01, 0.02, 0.025, 0.05, 0.1, 0.15, 0.2, 0.25)
+fut_res <- lapply(fut_thres, function(x) decide_futility(post_ctr_wide[analysis == 1], x))
+stop_res_ppos <- rbindlist(
+  lapply(fut_res, \(x) x[[1]]),
+  idcol = "futility"
+)[
+  ,
+  futility := fut_thres[as.integer(futility)]
+]
+fin_res_ppos <- rbindlist(
+  lapply(fut_res, \(x) x[[2]]),
+  idcol = "futility"
+)[
+  ,
+  futility := fut_thres[as.integer(futility)]
+]
+stop_res_ppos <- stop_res_ppos[post_cfg, on = "configuration"]
+
+subdat <- stop_res_ppos[K == 4 & eff_eps == 0.95 & status == "futile"]
+tab <- dcast(subdat[, .(futility, OR, P)], OR ~ futility, value.var = "P")
+kable(
+  tab,
+  caption = "Probability of satisfying futility condition at end of stage 2, $\\epsilon_{\\text{eff}} = 0.95$",
+  digits = 2,
+  linesep = " ",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = "HOLD_position",
+    font_size = 9
+  ) %>%
+  add_header_above(c(" " = 1, "$\\\\epsilon_{\\\\text{fut}}$" = length(fut_thres) - 1), escape = FALSE)
 ```
 
 
@@ -342,7 +417,7 @@ fin_res_ppos <- rbindlist(
 stop_res_ppos <- stop_res_ppos[post_cfg, on = "configuration"]
 ```
 
-Given the trial is only considered to have reached a conclusion for effectiveness if the investigational arm is superior to _both_ control groups, the effectiveness threshold results in a probability of stopping for effectiveness as less than 0.05 under the null scenario. However, the probability of declaring the investigiational arm as effective relative to _one_ of the arms at some point throughout the trials duration is much given the multiple analyses.
+Given the trial is only considered to have reached a conclusion for effectiveness if the investigational arm is superior to _both_ control groups, the effectiveness threshold results in a probability of stopping for effectiveness as less than 0.05 under the null scenario. However, the probability of declaring the investigiational arm as effective relative to _one_ of the arms at some point throughout the trials duration is much higher than that given the multiple analyses.
 
 ```{r}
 res <- stop_res_ppos[eff_eps == 0.95 & futility == 0 & analysis == K][, .(status, N, P, OR, K)]
@@ -481,7 +556,7 @@ kable(
 
 ```{r, fig.height=8, fig.cap = "Cumulative proportion of trials meeting decision criteria by futility threshold (columns), number of interims (rows = 4, 5, 6), and odds ratios (rows), for effectiveness threshold of $\\epsilon=0.95$."}
 ggplot(
-  stop_res_ppos[eff_eps == 0.95 & analysis <= K & !grepl("0.91", OR)],
+  stop_res_ppos[eff_eps == 0.95 & analysis <= K & K %in% 4:5],
   aes(analysis, P)
 ) +
   facet_grid(OR + K ~ futility) +
@@ -492,6 +567,10 @@ ggplot(
   scale_fill_viridis_d()
 ```
 
+
+\clearpage
+
+# Appendix - Other Figures 
 
 ```{r, fig.height=8, fig.cap = "Cumulative proportion of trials meeting decision criteria by futility threshold (columns), number of interims (rows = 4, 5, 6), and odds ratios (rows), for effectiveness threshold of $\\epsilon=0.96$."}
 stop_res_ppos <- stop_res_ppos[post_cfg, on = "configuration"]
@@ -538,7 +617,7 @@ ggplot(
 ```
 
 
-```{r}
+```{r, fig.cap = "Estimates for model parameters, $\\alpha$."}
 plot_alpha <- function(config = 1, interim = 1) {
   p1 <- ggplot(
     post_alpha[configuration == config & analysis == interim],
@@ -575,7 +654,7 @@ plot_alpha(84, 1)
 ```
 
 
-```{r}
+```{r, fig.cap = "Estimates for model contrasts."}
 plot_ctr <- function(config = 1, interim = 1) {
   true_ctr <- post_cfg[configuration == config, eta][[1]]
   true_ctr <- c(true_ctr[3] - true_ctr[1], true_ctr[3] - true_ctr[2])
@@ -606,7 +685,7 @@ plot_ctr(84, 1)
 ```
 
 
-```{r}
+```{r, fig.cap = "Estimates for model linear predictors, $\\eta$."}
 plot_eta <- function(config = 1, interim = 1) {
   true_eta <- post_cfg[configuration == config, eta][[1]]
   true_eta <- true_eta - mean(true_eta)
