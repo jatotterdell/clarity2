@@ -374,11 +374,12 @@ where the prior is weakly informed by CLARITY 1 results.
 A multi-state hazard model...
 
 \subsubsection{Length of ICU admission (days in ICU from admission to transfer to ward or death)}
-Negative binomial may need to be zero-adjusted, i.e. probability of any ICU admission, then conditional on admission, the number of days. Model selection, i.e. fit NB and ZA-NB and assess model fit.
+
+\textbf{Either just ordinal, or similarly as for length of hospital admission including new state: hospital -> icu -> discharge, hospital -> icu -> death, hospital -> icu -> hospital -> discharge etc.}
 
 \subsubsection{Requirement of ventilatory support (number of days with ventilation in days 0 - 28)}\label{sec:vent-support}
 
-\textbf{What about deaths? Code as worst outcome, i.e. 28 days? What about people who die without requiring any dialysis? Are they the same as someone dying and requiring 28 days with dialysis?}
+\textbf{Code deaths as worst outcome, i.e. 28 days? What about people who die without requiring any dialysis? Are they the same as someone dying and requiring 28 days with dialysis?}
 
 Counts and distributions of the outcome will be summarised by treatment group. A cumulative logistic proportional odds model will be assumed. If $y_i\in\{0,1,...,28,29\}$ denotes the number of days with ventilatory support (where 0 means 0 days, and 29 corresponds with death) for participant $i$, and $x_i$ the intervention design covariates, then
 $$
@@ -403,6 +404,8 @@ $$
 The primary contrasts will be the relative log-odds of having a worse outcome (higher outcome level) in the investigational arm compared to each of the contorl arms.
 
 Outcome levels with at least 1 observation will be included in the model. If any outcome levels have 0 observations then these will be excluded from the model.
+
+Non-proportionality, particularly with respect to death, to be investiated.
 
 \subsubsection{Requirement of dialysis (number of days with dialysis in days 0 - 28)}
 
@@ -467,7 +470,7 @@ The statistical software R will be used for data processing. Bayesian model post
 Analyses are planned to occur at the following stages of recruitment:
 
 \begin{itemize}
-    \item Exploratory safety analysis after 80 particiants randomsied 1:1 to ...
+    \item Exploratory safety analysis after 80 particiants randomsied 1:1 to two arms.
     \item Effectiveness analysis after an additional 520 participants randomised 1:1:1 to all 3 arms.
     \item Effectiveness analysis after every additional 600 participants up to the maximum sample size of 2,100 participants.
 \end{itemize}
