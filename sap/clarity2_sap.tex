@@ -10,7 +10,7 @@
 \usepackage{float}
 \usepackage{enumitem}
 \usepackage{lastpage}
-\usepackage[backend=biber,style=nature]{biblatex}
+\usepackage[backend=biber,style=authoryear]{biblatex}
 
 \addbibresource{clarity2_sap.bib} %Import the bibliography file
 
@@ -30,7 +30,7 @@
 \clearpairofpagestyles
 \pagestyle{scrheadings}
 \ihead{\headmark}
-\ifoot{CLARITY 2.0 SAP - Version 0.1}
+\ifoot{CLARITY 2.0 SAP - Version 0.2}
 \ofoot{\pagemark}
 
 % Setup line spacing
@@ -56,7 +56,7 @@
 
 \begin{document}
 \title{Statistical Analysis Plan}
-\subtitle{CLARITY 2}
+\subtitle{CLARITY 2.0}
 \author{James Totterdell}
 \date{\today}
 \makeatletter
@@ -65,8 +65,12 @@
         \includegraphics[width=0.7\linewidth]{clarity-logo.jpg}\\[4ex]
         {\huge \bfseries  \@title }\\[2ex]
         {\LARGE \bfseries  \@subtitle }\\[2ex]
-        {\large Version 0.1}\\[2ex]
-        {\large \@date}\\[10ex]
+        {\large An Investigator Initiated, International Multi-Centre, Multi-Arm, Multi-Stage
+        Randomised Double Blind Placebo Controlled Trial of Angiotensin Receptor
+        Blocker (ARB) and Chemokine Receptor Type 2 (CCR2) Antagonist for the Treatment
+        of COVID-19}\\[2ex]
+        {\LARGE Version 0.2}\\[2ex]
+        {\LARGE \@date}\\[10ex]
         \fbox{\begin{tabular}{p{0.20\linewidth}p{0.5\linewidth}}
                 Sponsor:         & The University of Sydney \\
                 Registration:    & CTC0312                  \\
@@ -85,24 +89,35 @@
 
 \section*{Preface}
 
-This statistical analysis plan (SAP) outlines the data and procedures for analysing effectiveness and safety of trial interventions from the protocol CLARITY 2.0: An Investigator Initiated, International Multi-Centre, Multi-Arm, Multi-Stage Randomised Double Blind Placebo Controlled Trial of Angiotensin Receptor Blocker (ARB) \& Chemokine Receptor Type 2 (CCR2) Antagonist for the Treatment of COVID-19
+This statistical analysis plan (SAP) outlines the data and procedures for analysing effectiveness and safety of trial interventions from the protocol CLARITY 2.0: An Investigator Initiated, International Multi-Centre, Multi-Arm, Multi-Stage Randomised Double Blind Placebo Controlled Trial of Angiotensin Receptor Blocker (ARB) \& Chemokine Receptor Type 2 (CCR2) Antagonist for the Treatment of COVID-19.
 
-The following documents were reviewed when preparing this SAP:
+The content of this SAP aims to satisfy the recommended items as outlined in \cite{gamble2017}.
+
+The following documents were reviewed when preparing this SAP (most recent version only):
+
 \begin{itemize}
     \item CLARITY 2.0 Study Protocol version 2.0 24 September 2021
 \end{itemize}
+
 
 The planned analyses are similar to those undertaken in the CLARITY trial \cite{hockham2021protocol, mcgree2021controlled}.
 
 \section*{Version History}
 
+\subsection*{Note}
+
+On 2022-07-25 we were informed that the funder had issued a letter of termination for the study. The study coordinaters anticipated that around 50 participants would be recruited in total by the time of study closure. This was substantially less than the planned (minimum) sample size of 600 participants. This sample size would result in approximately 25 participants allocated to the investigational arm. Therefore, the originally planned analyses may have little value and the models only weakly informed by the available data.
+
+Therefore, this statistical analysis plan was revised to focus the analyses on descriptive summaries of the data and exploratory modelling which might be combined with external information (e.g. historical controls). The originally planned statistical modelling has been retained, but the expectation is that data will be insufficient to reliably undertake these anaylses.
+
 \begin{table}[H]
     \begin{center}
-        \begin{tabular}{lllp{5cm}}
+        \begin{tabular}{lllp{6cm}}
             \hline
             Version & Date       & Author           & Description \\
             \hline
             0.1     & 2022-02-08 & James Totterdell & First draft \\
+            0.2     & 2022-08-17 & James Totterdell & Revise SAP to focus on descriptive component given early termination of the trial. These revisions were made after termination of the trial, but prior to any data becoming available. \\
             \hline
         \end{tabular}
     \end{center}
@@ -110,14 +125,39 @@ The planned analyses are similar to those undertaken in the CLARITY trial \cite{
 
 \section*{Abbreviations}
 
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ll}
+            \hline 
+            Abbreviation & Term \\
+            \hline 
+            CHS & Clinical Health Score \\
+            ICU & Intensive Care Unit \\
+            SAP & Statistical Analysis Plan \\
+            \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
 \clearpage
 
 \section{Trial Objectives}
 
-\subsection{Primary Objective and Outcome}
-The primary objective is to evaluate the safety and efficacy of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease, assessed by: \textbf{Clinical Health Score at day 14.}
+\subsection{Rationale}
+The major cause of mortality from COVID-19 has been life-threatening pneumonia and acute respiratory distress syndrome (ARDS). Elevated levels of a number of proinflammatory cytokines, including interleukin-6 (IL-6) and monocyte chemoattractant protein-1 (MCP-1, also known as C-C Motif Chemokine Ligand 2 [CCL2]) have been reported in patients with severe COVID-19, suggesting involvement of a hyper-inflammatory immune response. MCP-1 is a chemokine with a key role in macrophage recruitment and activation and is the natural ligand for Chemokine Receptor Type 2 (CCR2). The utility of CCR2 antagonism in the managing COVID-19 infection has not been tested, with most programs testing CCR2 in the setting of chronic disease such as renal disease.
 
-This Clinical Health Score is determined within an 8-point ordinal scale of health status which is a modified version of the 9-point score developed by the WHO for Coronavirus Disease 2019 (COVID-19) trials. A single score will be reported with higher values corresponding to worse symptoms. The ordinal scale is an assessment of the clinical status of the participant at the first assessment for the day, measured at day 14 after the date of randomisation.
+Alongside the role of chemokines in inducing the hyperinflammatory response, there is good evidence that the renin-angiotensin system (RAS) may also play a role in the pathophysiology of COVID-19. The RAS is responsible for regulating haemodynamic, inflammatory, and fibrotic processes, and includes two main cross-regulating axes: the vasoconstrictive, pro-inflammatory, pro-fibrotic ACE-Ang II-AT1R axis, and the vasodilatory, anti-inflammatory, anti-fibrotic ACE2-Ang1-7-MasR and ACE2-Ang1-9-AT2R axis. SARS-CoV-2 responsible for COVID-19 appears to bind and downregulate angiotensin converting enzyme type 2 (ACE2). Animal studies of the related SARS- CoV-1 suggest that this downregulation of ACE2 is sufficient for causing lung pathology and is reversed by treatment with an Angiotensin Receptor Blocker (ARB). Several randomised controlled trials are underway to assess the effectiveness of ARBs in limiting the severity of COVID-19.
+
+CLARITY 2.0 is an investigator-initiated trial that will evaluate the safety and efficacy of dual treatment with repagermanium, a CCR2 antagonist and candesartan, an ARB, in patients hospitalised with COVID-19 disease.
+
+
+The full rationale are outlined in the protocol. 
+
+
+\subsection{Primary Objective and Outcome}
+The primary objective is to evaluate the safety and efficacy of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease, assessed by their \textbf{Clinical Health Score at day 14.}
+
+This Clinical Health Score (CHS) is determined within an 8-point ordinal scale of health status which is a modified version of the 9-point score developed by the WHO for Coronavirus Disease 2019 (COVID-19) trials. A single score will be reported with higher values corresponding to worse symptoms. The ordinal scale is an assessment of the clinical status of the participant at the first assessment for the day, measured at day 14 after the date of randomisation.
 
 The 8-point ordinal scale used for Clinical Health Score is:
 \begin{enumerate}[nolistsep]
@@ -210,6 +250,8 @@ one tablet twice daily + matched placebo repagermanium one capsule twice daily.
 
 Treatment for will continue for 28 days.
 
+\emph{Due to early termination of the trial, no participants will have been assigned to the P+P arm.}
+
 \subsection{Randomisation}
 For stage 1, treatment allocation will be 1:1 randomisation via block randomisation stratified by centre between the investigational arm (C+R) and control arm 1 (C+P).
 
@@ -219,6 +261,9 @@ Following stage 1, in stage 2 the three arms will be randomised 1:1:1 using bloc
 The packaging and labelling of interventions will be designed to maintain blinding to the study team and to participants (double-blind).
 
 \subsection{Sample Size}
+
+\emph{Prior to completion of the SAP, the trial was terminated early at the discretion of the funder during recruitment for stage 1 of the trial (planned data collection for safety review). The expected final sample size post-termination was 50 participants. Therefore, the originally planned sample size described below does not apply. It's expected that these 50 participants will be approximately distributed as 25 to each of C+R and C+P given the 1:1 randomisation.}
+
 Stage 1 of the trial will recruit 80 participants from India for a safety analysis.
 
 Stage 2 of the trial will recruit an additional 520 participants. Information from other relevant trials will be utilised to inform the decision for dropping one of the two control arms.
@@ -245,7 +290,7 @@ The following characteristics will be described separately for patients randomis
     \item concomitant medications
     \item recent blood test results
 \end{itemize}
-In general, discrete data will be summarised by counts and proportions. Continuous variables will be summarised by median, lower quartile, upper quartile, minimum and maximum, or where appropriate, by mean and standard deviation. Counts and proportions of missing baseline values will be reported.
+In general, discrete data will be summarised by counts and proportions of participants within each level of the outcome. Continuous variables will be summarised by median, lower quartile, upper quartile, minimum and maximum, or where appropriate, by mean and standard deviation. Counts and proportions of missing baseline values will be reported for each baseline variable.
 
 \subsection{Completeness of Follow-up}
 The number and percentage of participants with follow-up information at day 14 and at day 28 post randomisation will be reported. Patterns of missingness will be summarised for primary and secondary outcomes.
@@ -253,16 +298,82 @@ The number and percentage of participants with follow-up information at day 14 a
 \subsection{Treatment Adherence}
 The number and proportion of patients who did not receive the treatment they were allocated to will be reported (if any). Concomitant medications received during the treatment period will be reported. Details on the number of days/doses of treatment received will be reported for each arm and compared with the treatment protocol. The number and proportion of participants who discontinued treatment, the timing of discontinuation, and the reasons for discontinuation as specified in the protocol will be reported.
 
+\subsection{Outcomes}
+
+The following planned descriptive summaries outline the minimum required for reporting for the study outcomes. Additional summaries (figures, tables, other summary statistics) may be provided as appropriate or as requested.
+
+For all outcomes, summaries will be grouped by the assigned study arm. For all outcomes, the count and proportion of participants with missing values should be reported.
+
+\subsubsection{Primary Outcome}
+Clinical health score is an ordinal outcome with 8 levels. For clinical health score at day 14, the count and proportion of participants in each level of the ordinal scale will be reported by treatment arm along with the count and proportion with missing outcome.
+
+\subsubsection{Secondary Outcomes}
+
+The following should at least be reported for each secondary outcome:
+
+\begin{enumerate}
+    \item \textbf{Clinical Health Score at day 28 (ordinal):} \\
+        As per the primary outcome.
+    \item \textbf{ICU admission days 0 to 28 (binary):} \\
+        ICU admission is a binary outcome (assuming that a patient can only have one ICU admission within 28 days). The count and proportion of participants who had an ICU admission. Additionally, a cross tabulation of ICU admission with death: neither death nor ICU, ICU without death, death without ICU admission, ICU followed by death.
+    \item \textbf{Death days 0 to 28 (binary):} \\
+        The count and proportion of participants who died within 28 days.
+    \item \textbf{Time to death (days), assessed from hospital admission (discrete):} \\
+        Time to death will be censored at either the end of follow-up (180 days post-randomisation) or in the case of loss-to-follow-up, at the last study day on which the participant was known to be alive. Kaplan-Meier curves (or a discrete-time equivalent) for time to death will be presented.
+    \item \textbf{Acute Kidney Injury days 0 to 28 (binary):} \\
+        The count and proportion of participants who experienced AKI within 28 days.
+    \item \textbf{Respiratory Failure days 0 to 28 (binary):} \\
+        The count and proportion of participants who experienced RF within 28 days.
+    \item \textbf{Length of hospital admission, days of inpatient stay from admission to discharge or death (discrete):}
+        The distribution of days in hospital and the count/proportion of participants with each value. The median, Q1, and Q3 days in hospital.
+    \item \textbf{Length of ICU admission, days in ICU from admission to transfer to ward or death, (discrete):} \\
+        The distribution of days in ICU and the count/proportion of participants with each value. The median, Q1, and Q3 days in ICU amongst all participants and amongst those who spent any time in ICU.
+    \item \textbf{Requirement of ventilatory support, days with ventilation on days 0 to 28 (discrete):} \\
+        The count and proportion of participants who required any ventilatory support. The distribution of number of days requiring ventilatory support and relevant summaries of this distribution (median, Q1, Q3 etc).
+    \item \textbf{Requirement of dialysis, days with dialysis in days 0 to 28 (discrete):} \\
+        The count and proportion of participants who required any dialysis. The distribution of number of days requiering dialysis and relevant summaries of this distribution (median, Q1, Q3 etc).
+    \item \textbf{Clinical Health Score at day 60:} \\
+        As per the primary outcome.
+    \item \textbf{Clinical Health Score at day 90:} \\
+        As per the primary outcome.
+    \item \textbf{Clinical Health Score at day 180:} \\
+        As per the primary outcome.
+\end{enumerate}
+
+\subsubsection{Safety Outcomes}
+
+The following should at least be reported for each secondary outcome:
+
+\begin{enumerate}[resume]
+    \item \textbf{Hypotension, requiring an urgent or non-urgent intervention (e.g., reduction in dose or cessation of anti-hypertensive, vasopressors, intravenous fluids) days 0-28 (binary):} \\
+        The count and proportion of participants who met the definition within 28 days.
+    \item  \textbf{Hyperkalaemia (defined as a K>5.5-6.0 mmol/L or requiring an intervention including hospitalisation; K>6.0 mmol/L) days 0-28 (binary):} \\ 
+        The count and proportion of participants who met the definition within 28 days.
+    \item \textbf{Deranged Liver Function Tests (defined as Aspartate Aminotransferase (AST) and Alanine Aminotransferase (ALT) >Upper Limit of Normal (ULN) or >1.5 times baseline) days 0- 28 (binary):} \\
+        The count and proportion of participants who met the definition within 28 days.
+    \item \textbf{Total SAEs}:
+        The count and proportion of participants who experienced any SAEs. The total number and rate of any SAEs.
+\end{enumerate}
+
+\subsubsection{Additional Summaries}
+
+If available, the daily distribution (between day 0 to 28) of the clinical health score outcome will be summarised (counts and proportions) for each treatment group and may be presented as a stacked bar chart with day on the x-axis and cumulative proportion on the y-axis, coloured by the ordinal levels.
+
 \clearpage
 
 \section{Comparative Analyses}
 
+\textit{The following comparative statistical analyses were originally planned for the study outcomes. However, due to the early trial termination and small expected sample size the originally planned analyses may have little value or be only weakly informed from the data due to small numbers of events (e.g. time to death, length of ICU stay, etc.). For this reason, the planned analyses introduced in the following may not be undertaken or may be greatly simplified at the discretion of the analyst.}
+
+\textit{Alternatively, the analyses described (or similar) may be used as an exploratory venture where it's considered to be of value, or used as a guide for models considered in investigating methods which incorporate historical controls (from CLARITY 1.0) or other external information into the analyses in a more considered way. In the absence of any pre-specified use of external controls, any analyses incorporating them should be identified as exploratory.}
+
+\textit{The planned analyses were for 3 study arms. Given no participants were allocated to the double placebo arm, one of the intervention covariates ($\beta$) should be dropped from each model.}
+
 Pairwise comparisons will be made between the investigational arm and each control arm. For all outcomes, the primary analyses will be performed with treatment groups as assigned by randomisation (de facto estimand) irrespective of treatment withdrawal or failure to comply with the protocol.
 
-For all models, any baseline covariates included for adjustment will be mean-centred where appropriate, and the treatment design (denoted by $x$) will use orthonormal contrasts such that intercepts represent the outcome distribution amongst "average" patients assuming equal weighting across all treatment groups.
+For all models, any baseline covariates included for adjustment will be mean-centred where appropriate, and the treatment design (denoted by $x$) will use treatment contrasts such that intercepts represent the outcome distribution amongst patients assuming equal weighting across all treatment groups.
 
 The posterior distribution of each contrast of interest will be reported along with posterior summaries: median, 95\% highest density credible interval, and posterior probability of events of interest (e.g. that $\beta < 0$). Posterior summaries of other model parameters will be reported.
-
 
 \subsection{Intercurrent Events}
 
@@ -271,12 +382,12 @@ For most analyses, the only intercurrent event (ICE) of concern is death. In mos
 For other intercurrent events (e.g. treatment switching/withdrawal) the treatment-policy strategy will be used with treatment groups analysed as assigned irrespective of withdrawal from or discontinuation of the assigned treatment.
 
 \subsection{Primary Outcome}\label{sec:primary-outcome-analysis}
-The clinical health status at day 14 will be summarised by counts and proportions of patients within each outcome level by study arm (i.e. the distribution of outcome levels). The following Bayesian cumulative logistic regression model will be updated using the available data.
+The following Bayesian cumulative logistic regression model will be updated using the available data.
 $$
     \begin{aligned}
         y_{i} | \pi;x_i                            & \sim \text{Categorical}(\pi(x_i))                              \\
         \mathbb P(y_i \leq k | \alpha, \beta; x_i) & = \text{logit}^{-1}(\eta_{ik})                                 \\
-        \eta_{i}                                   & = x_i^{\mathsf{T}}\beta + \cdots\quad(\text{other covariates}) \\
+        \eta_{i}                                   & = x_i^{\mathsf{T}}\beta \\
         \pi_k(\eta)                                & = \begin{cases}
             \text{logit}^{-1}(\alpha_1 - \eta)                                            & k=1             \\
             \text{logit}^{-1}(\alpha_{k} - \eta) - \text{logit}^{-1}(\alpha_{k-1} - \eta) & k\in\{2,...,7\} \\
@@ -289,27 +400,29 @@ $$
     \begin{aligned}
         \pi(0)          & \sim \text{Dirichlet}(\kappa)                            \\
         \beta_1,\beta_2 & \sim \text{Normal}(0, 1)                                 \\
-        \kappa          & = 8\cdot(0.80, 0.11, 0.02, 0.02, 0.01, 0.01, 0.01, 0.02)
+        \kappa          & = 4\cdot(0.80, 0.11, 0.02, 0.02, 0.01, 0.01, 0.01, 0.02)
     \end{aligned}
 $$
-where the hyper-parameters $\kappa$ are weakly informed by the observed distribution at day 14 in CLARITY 1.
+where the hyper-parameters $\kappa$ are weakly informed by the observed distribution at day 14 in CLARITY 1. The weight of 4 given to this prior was chosen ad-hoc for model stability.
 
-Due to the orthornormal design coding, the prior specified on $\pi(0)$ is the prior distribution on the outcome levels for an average patient with equal weighting given to each study arm, rather than the distribution of outcome levels for patients in the double placebo control group.
+As a prior sensitivity check, the model should also be fit assuming a weakly informative prior on the outcome levels, i.e.
+$$
+\kappa = 2 \times (1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8, 1/8)
+$$
+
+Due to the planned use of orthornormal design coding, the prior specified on $\pi(0)$ is the prior distribution on the outcome levels for an average patient with equal weighting given to each study arm, rather than the distribution of outcome levels for patients in the double placebo control group (\textit{note that due to early termination, no participants will have been assigned to the double placebo control group, so $\beta_2$ should be dropped from the model and it may be that treatment coding are more appropriate for the design with control arm \#1 as the reference group}).
 
 \subsection{Secondary Outcomes}
 
 \subsubsection{Clinical health score at day 28}
 The analysis will be analagous to that for clinical health score at day 14 (\ref{sec:primary-outcome-analysis}), but with a different prior. The prior is weakly informed by CLARITY 1 outcome data at day 28. For this outcome we specify
 $$
-    \kappa = (0.91, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.02)
+    \kappa = 4\times(0.91, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.02)
 $$
 for the hyper-parameter on the prior for $\pi(0)$.
 
 \subsubsection{ICU admission (incidence days 0 - 28)}\label{sec:icu-analysis}
-
-\textbf{Participants who die without ICU admission? Just $\mathbf{y_i=0}$? Or define as ordinal outcome with 0 - no ICU, 1 - ICU, 2 - Death? Or if die without ICU, count as ICU in any case, i.e. $\mathbf{y_i=1}$?}
-
-The number and proportion of patients with any ICU admission in days 0 to 28 will be reported.The following Bayesian logistic regression model will be updated using the available data.
+The following Bayesian logistic regression model will be updated using the available data.
 $$
     \begin{aligned}
         y_i|\pi_i & \sim \text{Bernoulli}(\pi_i)   \\
@@ -326,6 +439,13 @@ $$
 $$
 where the prior for $\alpha$ is weakly informed by CLARITY 1 results.
 
+The model above ignores deaths (i.e. participants who died without requiring ICU admission are counted as no ICU admission). If it is necessary to account for deaths as part of the outcome, then the outcome may be modified to be either:
+\begin{itemize}
+    \item ICU admission or death vs neither (binary)
+    \item death (2), ICU admission (1), neither (0) (ordinal)
+\end{itemize}
+with similar priors weakly informed from CLARITY 1.0.
+
 \subsubsection{Death (incidence days 0 - 28)}
 This outcome will be analysed analgously to the ICU incidence outcome (\ref{sec:icu-analysis}). However, the following priors will instead be specified
 $$
@@ -334,9 +454,7 @@ $$
 where the prior is weakly informed by CLARITY 1 results.
 
 \subsubsection{Time to death (from randomisation)}
-Time to death will be censored at either the end of follow-up (\textbf{Protocol doesn't mention this explicitly, but I'm assuming death will be identified up to 180 days post-randomisation}) or in the case of loss-to-follow-up, at the last study day on which the participant was known to be alive.
-
-Kaplan-Meier curves for time to death will be presented by treatment group. Time to death will be analysed a proportional hazards model. The baseline hazard will be modelled flexibly using M-splines.
+Time to death will be analysed assuming a proportional hazards model. The baseline hazard will be modelled flexibly using M-splines.
 
 Let $D_i = (y_i, \nu_i)$ denote the data for subject $i$ where $y_i$ is the event time and $\nu_i$ and indicator for censoring or observation of the event. The model for the hazard is
 $$
@@ -347,7 +465,16 @@ $$
         \lambda_i(y_i)     & = \lambda_0(y_i)\exp(\eta_i)                                    \\
     \end{aligned}
 $$
-where $M_l(t;\tau)$ is the $l$th basis term for a M-spline of degree 3 with knots at locations $\tau=\{\tau_1,...,\tau_{L+4}\}$ evaluated at $t$. The default not location will be at the quantiles of observed event times. If this is determined to be inappropriate (too few events, insufficient flexible etc.) then an alternative may be specified.
+where $M_l(t;\tau)$ is the $l$th basis term for a M-spline of degree 3 with knots at locations $\tau=\{\tau_1,...,\tau_{L+4}\}$ evaluated at $t$. The default not location will be at the quantiles of observed event times. If this is determined to be inappropriate (too few events, insufficient flexible etc.) then an alternative may be specified (e.g. parametric baseline hazard).
+
+The priors are
+$$
+\begin{aligned}
+    \gamma & \sim \text{Dirichlet}(\kappa) \\
+    \beta  & \overset{\text{iid}}{\sim} \text{Normal}(0, 1)
+\end{aligned}
+$$
+where $\kappa = 2\times\{1/L\}_{l=1}^L$.
 
 The contrasts of interest will be the hazard ratio of the intervention group relative to each of the control groups.
 
@@ -369,19 +496,24 @@ where the prior is weakly informed by CLARITY 1 results.
 
 \subsubsection{Length of hospital admission (days of inpatient stay from admission to discharge or death)}
 
-\textbf{Death as a competing risk for time-to-discharge. Multi-state model hospitalised -> discharge -> death, hospitalised -> death. Protocol doesn't specify censoring time for this, again assuming 180 days (last day of follow-up).}
+This outcome is equivalently stated as the time to hospital discharge (either due to discharge home or death). Death should be treated as a competing event to being discharged alive. For simplicity (given that most participants will have died or been discharged within 28 days based in previous studies), the time to event may be treated as censored at day 28 and the outcome analysed by a time-to-event model for the competing events of discharge alive or death to day 28 assuming constant hazard associated with the intervention across all days from 1 to 28.
 
-A multi-state hazard model...
+For a discrete time-to-event model, denote by $d_i\in\{1,...,28\}$ denote the day of first event (or censoring at day 28) and $m\in\{0,1,2\}$ indicating the event type (still admitted to hospital, discharged alive, died) and $y_{id} = (y_{id0}, y_{id1}, y_{id2})$ with $y_{itm}\in\{0,1\}$ indicates the participant $i$ status at day $d\leq d_i$. Then
+$$
+\begin{aligned}
+\lambda_m(d, \eta) &= \frac{\exp(\alpha_{dm} + \eta_m)}{1 + \sum_{l=1}^M \exp(\alpha_{dl} + \eta_l)},\quad m=1,2 \\
+y_{id} &\sim \text{Multinomial}\left(1, \left(1 - \sum_{l=1}^2 \lambda_i(d,\eta_i), \lambda_1(d, \eta_i), \lambda_2(d, \eta_i)\right)\right),\quad d\leq d_i
+\end{aligned}
+$$
+where $\eta=(\eta_1,\eta_2)$ contains the event-specific linear predictors with event specific parameters.
 
 \subsubsection{Length of ICU admission (days in ICU from admission to transfer to ward or death)}
 
-\textbf{Either just ordinal, or similarly as for length of hospital admission including new state: hospital -> icu -> discharge, hospital -> icu -> death, hospital -> icu -> hospital -> discharge etc.}
+\textit{No analysis plan for this outcome had been written prior to early termination of the trial. Not all participants will have an ICU admission, this outcome will only be relevant to participants admitted to ICU. Given the small expected sample size (50) and the expectation that there will be a small number of ICU admissions, no analysis is planned beyond the descriptive summaries previously described.}
 
 \subsubsection{Requirement of ventilatory support (number of days with ventilation in days 0 - 28)}\label{sec:vent-support}
 
-\textbf{Code deaths as worst outcome, i.e. 28 days? What about people who die without requiring any dialysis? Are they the same as someone dying and requiring 28 days with dialysis?}
-
-Counts and distributions of the outcome will be summarised by treatment group. A cumulative logistic proportional odds model will be assumed. If $y_i\in\{0,1,...,28,29\}$ denotes the number of days with ventilatory support (where 0 means 0 days, and 29 corresponds with death) for participant $i$, and $x_i$ the intervention design covariates, then
+A cumulative logistic proportional odds model will be assumed. If $y_i\in\{0,1,...,28,29\}$ denotes the number of days with ventilatory support (where 0 means 0 days, and 29 corresponds to death) for participant $i$, and $x_i$ the intervention design covariates, then
 $$
     \begin{aligned}
         y_{i} | \pi;x_i                            & \sim \text{Categorical}(\pi(x_i))           \\
@@ -397,51 +529,51 @@ $$
 with prior distributions
 $$
     \begin{aligned}
-        \pi(0)          & \sim \text{Dirichlet}(\kappa) \quad \text{(weakly informed by CLARITY 1)} \\
+        \pi(0)          & \sim \text{Dirichlet}(\kappa)  \\
         \beta_1,\beta_2 & \sim \text{Normal}(0, 1).
     \end{aligned}
 $$
+where $\kappa = 2\times \{1/30\}_{k=0}^{29}$.
+
 The primary contrasts will be the relative log-odds of having a worse outcome (higher outcome level) in the investigational arm compared to each of the contorl arms.
 
-Outcome levels with at least 1 observation will be included in the model. If any outcome levels have 0 observations then these will be excluded from the model.
+If the outcome is sparse across the levels, then outcome levels may be aggregated (e.g. 0 days of ventilation vs any days ventilation in the most extreme case). The prior should be adjusted appropriately. 
 
 Non-proportionality, particularly with respect to death, to be investiated.
 
 \subsubsection{Requirement of dialysis (number of days with dialysis in days 0 - 28)}
 
-This outcome will be analysed analgously to \ref{sec:vent-support} but with prior hyper-parameter
-$$
-    \kappa = \cdot \quad \text{(weakly informed by CLARITY 1)}
-$$
-for $\pi(0)$.
+This outcome will be analysed analgously to \ref{sec:vent-support}.
 
 \subsubsection{Clinical health score at day 60}
 The analysis will be analagous to that for clinical health score at day 14 (\ref{sec:primary-outcome-analysis}), but with a different prior. The prior is weakly informed by CLARITY 1 outcome data. For this outcome we specify
 $$
-    \kappa = \cdots
+    \kappa = 2\times(0.91, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.02)
 $$
 for the hyper-parameter on the prior for $\pi(0)$.
 
 \subsubsection{Clinical health score at day 90}
 The analysis will be analagous to that for clinical health score at day 14 (\ref{sec:primary-outcome-analysis}), but with a different prior. The prior is weakly informed by CLARITY 1 outcome data. For this outcome we specify
 $$
-    \kappa = \cdots
+    \kappa  = 2\times(0.91, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.02)
 $$
 for the hyper-parameter on the prior for $\pi(0)$.
 
 \subsubsection{Clinical health score at day 180}
 The analysis will be analagous to that for clinical health score at day 14 (\ref{sec:primary-outcome-analysis}), but with a different prior. The prior is weakly informed by CLARITY 1 outcome data. For this outcome we specify
 $$
-    \kappa = \cdots
+    \kappa = 2\times(0.91, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.02)
 $$
 for the hyper-parameter on the prior for $\pi(0)$.
 
 \subsection{Safety Outcomes}
 
-For safety outcomes the number (and proportion) of participants experiencing the event of interest (hypotension, hyperkalaemia, deranged liver function, SAEs) and the total number (and rate) of events will be reported by treatment arm.
-
+For safety outcomes no formal modelling is planned beyond the descriptive statistics previously described. If required, logistic regression or count regression models with weakly informative priors may be used as relevant to the safety outcome.
 
 \subsection{Baseline Adjustments}
+
+\textit{Due to the small expected sample size, it's suggested that no baseline covariate adjustments are made. The following reports on the originally planned adjustments.}
+
 As randomisation is stratified by centre, all models will include centre as a random effect. The effect of centre will be assumed additive in the linear predictor and will be modelled by
 $$
     \begin{aligned}
@@ -466,6 +598,8 @@ The statistical software R will be used for data processing. Bayesian model post
 \clearpage
 
 \section{Trial Monitoring and Reporting}
+
+\textit{Due to early trial termination there will be no trial monitoring. The following is retained for reference to the original plan.}
 
 Analyses are planned to occur at the following stages of recruitment:
 
@@ -495,9 +629,5 @@ Calculation of these predictive quantities requires assumptions about the future
 \clearpage
 
 \printbibliography[heading=bibintoc]
-
-\clearpage
-
-\section*{Appendix I}
 
 \end{document}
