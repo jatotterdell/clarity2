@@ -77,3 +77,4 @@ docs/
 *.run.xml
 *.synctex.gz
 *.toc
+*.xdv
