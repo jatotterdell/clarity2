@@ -30,7 +30,7 @@
 \clearpairofpagestyles
 \pagestyle{scrheadings}
 \ihead{\headmark}
-\ifoot{CLARITY 2.0 SAP - Version 0.2}
+\ifoot{CLARITY 2.0 SAP - Version 0.3}
 \ofoot{\pagemark}
 
 % Setup line spacing
@@ -69,7 +69,7 @@
         Randomised Double Blind Placebo Controlled Trial of Angiotensin Receptor
         Blocker (ARB) and Chemokine Receptor Type 2 (CCR2) Antagonist for the Treatment
         of COVID-19}\\[2ex]
-        {\LARGE Version 0.2}\\[2ex]
+        {\LARGE Version 0.3}\\[2ex]
         {\LARGE \@date}\\[10ex]
         \fbox{\begin{tabular}{p{0.20\linewidth}p{0.5\linewidth}}
                 Sponsor:         & The University of Sydney \\
@@ -106,9 +106,25 @@ The planned analyses are similar to those undertaken in the CLARITY trial \cite{
 
 \subsection*{Note}
 
-On 2022-07-25 we were informed that the funder had issued a letter of termination for the study. The study coordinaters anticipated that around 50 participants would be recruited in total by the time of study closure. This was substantially less than the planned (minimum) sample size of 600 participants. This sample size would result in approximately 25 participants allocated to the investigational arm. Therefore, the originally planned analyses may have little value and the models only weakly informed by the available data.
+On 2022-07-25 we were informed that the study funder exercised its right to terminate the funding contract for the trial due to ongoing barriers to recrutiment. The barriers to recruitment were due to:
+\begin{itemize}
+    \item delays in manufacturing and packaging of IMP (quality concerns with first batch which required it's destruction, second batch encountered manufacturing delays)
+    \item delays with regulatory and ethics review and approvals
+    \item high screen failure rate due to mandated restriction on inclusion criteria of patients (only participants less than 65 years of age who were satisfied severity criteria).
+\end{itemize}
 
-Therefore, this statistical analysis plan was revised to focus the analyses on descriptive summaries of the data and exploratory modelling which might be combined with external information (e.g. historical controls). The originally planned statistical modelling has been retained, but the expectation is that data will be insufficient to reliably undertake these anaylses.
+Recruitment subsequently closed in India on 2022-08-17 due to expiry of the investigatonal medical products (IMP), with no more IMP to be provided by the funding company. Due to the unavailability of the intervention and study funding, the Trial Steering Commitee (TSC) decided to:
+
+\begin{itemize}
+    \item terminate recruitment into the trial
+    \item follow-up enrolled participants according to the protocol
+    \item close-out sites
+    \item analyse outcomes on the recruited participants as an exploratory analysis.
+\end{itemize}
+
+At the time of trial closure, 10 sites had been activated in India, and 49 participants had been randomised. This was substantially less than the planned (minimum) sample size of 600 participants. Therefore, the originally planned analyses may have little value and the models only weakly informed by the available data.
+
+This statistical analysis plan was revised to focus the analyses on descriptive summaries of the data and allow for exploratory modelling which might be combined with external information (e.g. historical controls). Consideration had been given to combining information from CLARITY1.0 to further inform the anlayses of CLARITY2.0, however, due to differences in elgibility criteria between the two trials (age restriction, and restriction of disease severity) there may be insufficient overlap between the trial populations to sensibly share information between them. Any such analyses may be considered as exploratory. The originally planned statistical modelling has been retained, but the expectation is that data will be insufficient to reliably undertake these anaylses. 
 
 \begin{table}[H]
     \begin{center}
@@ -118,6 +134,7 @@ Therefore, this statistical analysis plan was revised to focus the analyses on d
             \hline
             0.1     & 2022-02-08 & James Totterdell & First draft \\
             0.2     & 2022-08-17 & James Totterdell & Revise SAP to focus on descriptive component given early termination of the trial. These revisions were made after termination of the trial, but prior to any data becoming available. \\
+            0.3     & 2022-09-20 & James Totterdell & Additional revisions following MAJ comments \\
             \hline
         \end{tabular}
     \end{center}
@@ -132,8 +149,11 @@ Therefore, this statistical analysis plan was revised to focus the analyses on d
             Abbreviation & Term \\
             \hline 
             CHS & Clinical Health Score \\
+            CTCAE & Common Terminology Criteria for Adverse Events \\
             ICU & Intensive Care Unit \\
+            IMP & Investigational Medical Product \\
             SAP & Statistical Analysis Plan \\
+            TSC & Trial Steering Commitee \\
             \hline
         \end{tabular}
     \end{center}
@@ -148,14 +168,14 @@ The major cause of mortality from COVID-19 has been life-threatening pneumonia a
 
 Alongside the role of chemokines in inducing the hyperinflammatory response, there is good evidence that the renin-angiotensin system (RAS) may also play a role in the pathophysiology of COVID-19. The RAS is responsible for regulating haemodynamic, inflammatory, and fibrotic processes, and includes two main cross-regulating axes: the vasoconstrictive, pro-inflammatory, pro-fibrotic ACE-Ang II-AT1R axis, and the vasodilatory, anti-inflammatory, anti-fibrotic ACE2-Ang1-7-MasR and ACE2-Ang1-9-AT2R axis. SARS-CoV-2 responsible for COVID-19 appears to bind and downregulate angiotensin converting enzyme type 2 (ACE2). Animal studies of the related SARS- CoV-1 suggest that this downregulation of ACE2 is sufficient for causing lung pathology and is reversed by treatment with an Angiotensin Receptor Blocker (ARB). Several randomised controlled trials are underway to assess the effectiveness of ARBs in limiting the severity of COVID-19.
 
-CLARITY 2.0 is an investigator-initiated trial that will evaluate the safety and efficacy of dual treatment with repagermanium, a CCR2 antagonist and candesartan, an ARB, in patients hospitalised with COVID-19 disease.
+CLARITY 2.0 is an investigator-initiated trial that will evaluate the safety and efficacy of dual treatment with repagermanium, a CCR2 antagonist and candesartan, an ARB, in patients hospitalised with COVID-19 disease, against dual placebo and candesartan with placebo.
 
 
 The full rationale are outlined in the protocol. 
 
 
 \subsection{Primary Objective and Outcome}
-The primary objective is to evaluate the safety and efficacy of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease, assessed by their \textbf{Clinical Health Score at day 14.}
+The primary objective is to evaluate the safety and efficacy of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease against treatment with dual placebo, or placebo and candesartan, assessed by their \textbf{Clinical Health Score at day 14.}
 
 This Clinical Health Score (CHS) is determined within an 8-point ordinal scale of health status which is a modified version of the 9-point score developed by the WHO for Coronavirus Disease 2019 (COVID-19) trials. A single score will be reported with higher values corresponding to worse symptoms. The ordinal scale is an assessment of the clinical status of the participant at the first assessment for the day, measured at day 14 after the date of randomisation.
 
@@ -175,13 +195,13 @@ The 8-point ordinal scale used for Clinical Health Score is:
 The secondary objectives are to evaluate the safety and efficacy of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease, assessed by:
 \begin{enumerate}
     \item Clinical Health Score at day 28.
-    \item ICU admission (incidence in days 0-28).
-    \item Death (incidence in days 0-28).
+    \item ICU admission (incidence risk in days 0-28).
+    \item Death (incidence risk in days 0-28).
     \item Time to death, assessed from hospital admission to death.
-    \item Acute Kidney Injury (incidence in days 0-28).
-    \item Respiratory Failure (incidence in days 0-28).
+    \item Acute Kidney Injury (incidence risk in days 0-28).
+    \item Respiratory Failure (incidence risk in days 0-28).
     \item Length of hospital admission (days of inpatient stay from admission to discharge or death).
-    \item Length of ICU Admission (days in ICU from admission to transfer to ward or death).
+    \item Length of ICU Admission (days in ICU from admission to transfer to ward or death, 0 days of not admitted to ICU).
     \item Requirement of ventilatory support (count of days with ventilation in days 0-28).
     \item Requirement of dialysis (count of days with dialysis in days 0-28).
     \item Clinical Health Score at day 60.
@@ -190,7 +210,7 @@ The secondary objectives are to evaluate the safety and efficacy of dual treatme
 \end{enumerate}
 
 \subsection{Safety Objectives and Outcomes}
-The specific safety objectives are to evaluate the safety of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease, assessed by incidence of pre-specified clinical events:
+The specific safety objectives are to evaluate the safety of dual treatment with repagermanium and candesartan in patients hospitalised with COVID-19 disease, assessed by incidence (risk and rate if relevant) of pre-specified clinical events:
 
 \begin{enumerate}[resume]
     \item Hypotension, requiring an urgent or non-urgent intervention (e.g., reduction in dose or cessation of anti-hypertensive, vasopressors, intravenous fluids). Incidence in days 0-28.
@@ -204,13 +224,12 @@ The specific safety objectives are to evaluate the safety of dual treatment with
 \section{Study Design}
 CLARITY 2.0 is a prospective, Multi-Centre, Multi-Arm Multi-Stage Randomised, Double Blind, Placebo Controlled Trial, utilising adaptive sample size re-estimation. Stage 1 will include 80 patients for a Phase II safety analysis to be conducted in India. Stage 2 will include 520 participants for review of preliminary efficacy data. Expansion to Stage 3, a full Phase III study, will be subject to review of accumulated data in Stage 1 and Stage 2.
 
-Protocol Stage 1 will be conducted in India only. The rest of the world will initiate the study in Stage 2 regardless of the recruitment status of the Stage 1. Recruitment in India will not continue to Stage 2 until completion of the Stage 1 safety analysis and review and approval of the Indian Central Drugs Standard Control Organization Subject Expert Committee on COVID-19 related proposals.
+Protocol Stage 1 will be conducted in India only at multiple sites. The rest of the world will initiate the study in Stage 2 regardless of the recruitment status of the Stage 1. Recruitment in India will not continue to Stage 2 until completion of the Stage 1 safety analysis and review and approval of the Indian Central Drugs Standard Control Organization Subject Expert Committee on COVID-19 related proposals.
 
+\textit{Due to early termination, the trial did not progress beyond stage 1. All participants were from sites in India.}
 
 \subsection{Target Population}
-Participants must meet all the inclusion criteria, and none of the exclusion criteria, to be eligible for this trial. No exceptions will be made to these eligibility requirements at the time of randomisation. All enquiries about eligibility should be addressed by contacting the sponsor prior to randomisation.
-
-Adults with laboratory-confirmed diagnosis of SARS-CoV-2 infection intended for hospital admission for management of COVID-19.
+Participants must meet all the inclusion criteria, and none of the exclusion criteria, to be eligible for this trial. No exceptions will be made to these eligibility requirements at the time of randomisation. The target population is adults with laboratory-confirmed diagnosis of SARS-CoV-2 infection intended for hospital admission for management of COVID-19.
 
 \subsubsection{Eligibility}
 \textbf{Inclusion criteria:}
@@ -245,12 +264,11 @@ Adults with laboratory-confirmed diagnosis of SARS-CoV-2 infection intended for 
 
 \textbf{Control arm \#1 (C+P):} Titratable candesartan with commencing dose 4mg tablets twice daily (daily dose 8 mg) + matched placebo repagermanium one capsule twice daily.
 
-\textbf{Control arm \#2 (P+P):}  Titratable matched placebo candesartan
-one tablet twice daily + matched placebo repagermanium one capsule twice daily.
+\textbf{Control arm \#2 (P+P):}  Titratable matched placebo candesartan one tablet twice daily + matched placebo repagermanium one capsule twice daily.
 
 Treatment for will continue for 28 days.
 
-\emph{Due to early termination of the trial, no participants will have been assigned to the P+P arm.}
+\emph{Due to early termination of the trial, no participants will have been assigned to the P+P arm as the trial did not progress beyond stage 1.}
 
 \subsection{Randomisation}
 For stage 1, treatment allocation will be 1:1 randomisation via block randomisation stratified by centre between the investigational arm (C+R) and control arm 1 (C+P).
@@ -262,7 +280,7 @@ The packaging and labelling of interventions will be designed to maintain blindi
 
 \subsection{Sample Size}
 
-\emph{Prior to completion of the SAP, the trial was terminated early at the discretion of the funder during recruitment for stage 1 of the trial (planned data collection for safety review). The expected final sample size post-termination was 50 participants. Therefore, the originally planned sample size described below does not apply. It's expected that these 50 participants will be approximately distributed as 25 to each of C+R and C+P given the 1:1 randomisation.}
+\emph{Prior to completion of the SAP, the trial was terminated early at the discretion of the funder during recruitment for stage 1 of the trial (planned data collection for safety review). The final sample size post-termination was 49 participants. Therefore, the originally planned sample size described below does not apply. It's expected that these 49 participants will be approximately distributed as 25/24 to each of C+R and C+P given the 1:1 randomisation.}
 
 Stage 1 of the trial will recruit 80 participants from India for a safety analysis.
 
@@ -275,7 +293,7 @@ Progression to stage 3 will be subject to review of the combined stage 1 and sta
 \section{Descriptive Analyses}
 
 \subsection{Participant Throughput}
-The flow of participants through the trial will be summarised for each arm using a CONSORT diagram. The flow diagrams will describe the numbers of participants randomly allocated, who received allocation, withdrew consent, and included in the ITT analysis population.
+The flow of participants through the trial will be summarised for each arm using a CONSORT diagram. The flow diagrams will describe the numbers of participants eligible, consented, randomised, withdrew consent, and included in the ITT analysis population at each endpoint.
 
 \subsection{Baseline Characteristics}
 The following characteristics will be described separately for patients randomised to each arm:
@@ -296,7 +314,7 @@ In general, discrete data will be summarised by counts and proportions of partic
 The number and percentage of participants with follow-up information at day 14 and at day 28 post randomisation will be reported. Patterns of missingness will be summarised for primary and secondary outcomes.
 
 \subsection{Treatment Adherence}
-The number and proportion of patients who did not receive the treatment they were allocated to will be reported (if any). Concomitant medications received during the treatment period will be reported. Details on the number of days/doses of treatment received will be reported for each arm and compared with the treatment protocol. The number and proportion of participants who discontinued treatment, the timing of discontinuation, and the reasons for discontinuation as specified in the protocol will be reported.
+The number and proportion of patients who did not receive any of the treatment they were allocated to will be reported (if any). Concomitant medications received during the treatment period will be reported. Details on the number of days/doses of treatment received will be reported for each arm and compared with the treatment protocol. The number and proportion of participants who discontinued treatment (stopped and did not restart), the timing of discontinuation, and the reasons for discontinuation as specified in the protocol will be reported.
 
 \subsection{Outcomes}
 
@@ -327,7 +345,7 @@ The following should at least be reported for each secondary outcome:
     \item \textbf{Length of hospital admission, days of inpatient stay from admission to discharge or death (discrete):}
         The distribution of days in hospital and the count/proportion of participants with each value. The median, Q1, and Q3 days in hospital.
     \item \textbf{Length of ICU admission, days in ICU from admission to transfer to ward or death, (discrete):} \\
-        The distribution of days in ICU and the count/proportion of participants with each value. The median, Q1, and Q3 days in ICU amongst all participants and amongst those who spent any time in ICU.
+        The distribution of days in ICU and the count/proportion of participants with each value. The median, Q1, and Q3 days in ICU amongst all participants (those with no ICU admission counted as 0 days) and amongst those who spent any time in ICU (those where ICU days > 0).
     \item \textbf{Requirement of ventilatory support, days with ventilation on days 0 to 28 (discrete):} \\
         The count and proportion of participants who required any ventilatory support. The distribution of number of days requiring ventilatory support and relevant summaries of this distribution (median, Q1, Q3 etc).
     \item \textbf{Requirement of dialysis, days with dialysis in days 0 to 28 (discrete):} \\
@@ -345,9 +363,9 @@ The following should at least be reported for each secondary outcome:
 The following should at least be reported for each secondary outcome:
 
 \begin{enumerate}[resume]
-    \item \textbf{Hypotension, requiring an urgent or non-urgent intervention (e.g., reduction in dose or cessation of anti-hypertensive, vasopressors, intravenous fluids) days 0-28 (binary):} \\
+    \item \textbf{Hypotension, requiring an urgent or non-urgent intervention (e.g., reduction in dose or cessation of anti-hypertensive, vasopressors, intravenous fluids) [i.e. Grade 2 or greater on CTCAE] days 0-28 (binary):} \\
         The count and proportion of participants who met the definition within 28 days.
-    \item  \textbf{Hyperkalaemia (defined as a K>5.5-6.0 mmol/L or requiring an intervention including hospitalisation; K>6.0 mmol/L) days 0-28 (binary):} \\ 
+    \item  \textbf{Hyperkalaemia (defined as a K>5.5-6.0 mmol/L or requiring an intervention including hospitalisation; K>6.0 mmol/L) [i.e. Grade 2 or greater on CTCAE] days 0-28 (binary):} \\ 
         The count and proportion of participants who met the definition within 28 days.
     \item \textbf{Deranged Liver Function Tests (defined as Aspartate Aminotransferase (AST) and Alanine Aminotransferase (ALT) >Upper Limit of Normal (ULN) or >1.5 times baseline) days 0- 28 (binary):} \\
         The count and proportion of participants who met the definition within 28 days.
@@ -363,11 +381,11 @@ If available, the daily distribution (between day 0 to 28) of the clinical healt
 
 \section{Comparative Analyses}
 
-\textit{The following comparative statistical analyses were originally planned for the study outcomes. However, due to the early trial termination and small expected sample size the originally planned analyses may have little value or be only weakly informed from the data due to small numbers of events (e.g. time to death, length of ICU stay, etc.). For this reason, the planned analyses introduced in the following may not be undertaken or may be greatly simplified at the discretion of the analyst.}
+\textit{The following comparative statistical analyses were originally planned for the study outcomes. However, due to the early trial termination and small sample size, the originally planned analyses may have little value or be very weakly informed by the available data due to small numbers of events (e.g. time to death, length of ICU stay, etc.). For this reason, the planned analyses introduced in the following may not be undertaken or may be greatly simplified at the discretion of the analyst.}
 
-\textit{Alternatively, the analyses described (or similar) may be used as an exploratory venture where it's considered to be of value, or used as a guide for models considered in investigating methods which incorporate historical controls (from CLARITY 1.0) or other external information into the analyses in a more considered way. In the absence of any pre-specified use of external controls, any analyses incorporating them should be identified as exploratory.}
+\textit{Alternatively, the analyses described (or similar) may be used as an exploratory venture where it's considered to be of value, or used as a guide for models considered in investigating methods which incorporate historical controls (from CLARITY 1.0, noting differences between eligibility criteria due to age and severity restrictions) or other external information into the analyses in a more considered way. In the absence of any pre-specified use of external controls, any analyses incorporating them should be identified as exploratory.}
 
-\textit{The planned analyses were for 3 study arms. Given no participants were allocated to the double placebo arm, one of the intervention covariates ($\beta$) should be dropped from each model.}
+\textit{The planned analyses were for 3 study arms. Given no participants were allocated to the double placebo arm, one of the intervention covariates ($\beta$) would be dropped from each model.}
 
 Pairwise comparisons will be made between the investigational arm and each control arm. For all outcomes, the primary analyses will be performed with treatment groups as assigned by randomisation (de facto estimand) irrespective of treatment withdrawal or failure to comply with the protocol.
 
@@ -442,7 +460,7 @@ where the prior for $\alpha$ is weakly informed by CLARITY 1 results.
 The model above ignores deaths (i.e. participants who died without requiring ICU admission are counted as no ICU admission). If it is necessary to account for deaths as part of the outcome, then the outcome may be modified to be either:
 \begin{itemize}
     \item ICU admission or death vs neither (binary)
-    \item death (2), ICU admission (1), neither (0) (ordinal)
+    \item death (2), ICU admission without death (1), neither (0) (ordinal)
 \end{itemize}
 with similar priors weakly informed from CLARITY 1.0.
 
@@ -465,7 +483,7 @@ $$
         \lambda_i(y_i)     & = \lambda_0(y_i)\exp(\eta_i)                                    \\
     \end{aligned}
 $$
-where $M_l(t;\tau)$ is the $l$th basis term for a M-spline of degree 3 with knots at locations $\tau=\{\tau_1,...,\tau_{L+4}\}$ evaluated at $t$. The default not location will be at the quantiles of observed event times. If this is determined to be inappropriate (too few events, insufficient flexible etc.) then an alternative may be specified (e.g. parametric baseline hazard).
+where $M_l(t;\tau)$ is the $l$th basis term for a M-spline of degree 3 with knots at locations $\tau=\{\tau_1,...,\tau_{L+4}\}$ evaluated at $t$. The default knot location will be at the quantiles of observed event times. If this is determined to be inappropriate (too few events, insufficiently flexible etc.) then an alternative may be specified (e.g. parametric baseline hazard).
 
 The priors are
 $$
@@ -478,7 +496,7 @@ where $\kappa = 2\times\{1/L\}_{l=1}^L$.
 
 The contrasts of interest will be the hazard ratio of the intervention group relative to each of the control groups.
 
-If there is clear departure from proportional hazards assumption, then the treatment effect parameters $\beta$ may be allowed to vary with time rather than a time-invariant effect. In this case, restricted mean survival time will be the comparison of interest.
+If there is clear departure from proportional hazards assumption, then the treatment effect parameters $\beta$ may be allowed to vary with time rather than be included as a time-invariant effect. In this case, restricted mean survival time will be the effect summary of interest.
 
 \subsubsection{Acute kidney injury (incidence in days 0 - 28)}
 This outcome will be analysed analgously to the ICU incidence outcome (\ref{sec:icu-analysis}). However, the following priors will instead be specified
@@ -496,16 +514,19 @@ where the prior is weakly informed by CLARITY 1 results.
 
 \subsubsection{Length of hospital admission (days of inpatient stay from admission to discharge or death)}
 
-This outcome is equivalently stated as the time to hospital discharge (either due to discharge home or death). Death should be treated as a competing event to being discharged alive. For simplicity (given that most participants will have died or been discharged within 28 days based in previous studies), the time to event may be treated as censored at day 28 and the outcome analysed by a time-to-event model for the competing events of discharge alive or death to day 28 assuming constant hazard associated with the intervention across all days from 1 to 28.
+This outcome is equivalently stated as the time to hospital discharge (either due to discharge home or death). Death should be treated as a competing event to being discharged alive. For simplicity (given that most participants will have died or been discharged within 28 days based in previous studies), the time to event may be treated as censored at day 28 and the outcome analysed by a time-to-event model for the competing events of discharge alive or death to day 28 assuming constant hazard associated with the intervention across all days from 1 to 28 (if such censoring is inappropriate due to a large number of patients remaining admitted beyond 28 days then this may be changed at the discretion of the analyst).
 
-For a discrete time-to-event model, denote by $d_i\in\{1,...,28\}$ denote the day of first event (or censoring at day 28) and $m\in\{0,1,2\}$ indicating the event type (still admitted to hospital, discharged alive, died) and $y_{id} = (y_{id0}, y_{id1}, y_{id2})$ with $y_{itm}\in\{0,1\}$ indicates the participant $i$ status at day $d\leq d_i$. Then
+For a discrete time-to-event model, denote by $d_i\in\{1,...,28\}$ the day of first event (or censoring at day 28) and $m\in\{0,1,2\}$ the event type (still admitted to hospital, discharged alive, died) and $y_{id} = (y_{id0}, y_{id1}, y_{id2})$ with $y_{itm}\in\{0,1\}$ indicates the participant $i$ status at day $d\leq d_i$. Then
 $$
 \begin{aligned}
 \lambda_m(d, \eta) &= \frac{\exp(\alpha_{dm} + \eta_m)}{1 + \sum_{l=1}^M \exp(\alpha_{dl} + \eta_l)},\quad m=1,2 \\
 y_{id} &\sim \text{Multinomial}\left(1, \left(1 - \sum_{l=1}^2 \lambda_i(d,\eta_i), \lambda_1(d, \eta_i), \lambda_2(d, \eta_i)\right)\right),\quad d\leq d_i
 \end{aligned}
 $$
-where $\eta=(\eta_1,\eta_2)$ contains the event-specific linear predictors with event specific parameters.
+where $\eta=(\eta_1,\eta_2)$ contains the event-specific linear predictors with event specific parameters, i.e.
+$$
+\eta_m = x_i^\mathsf{T}\beta_m, \quad m = 1,2.
+$$
 
 \subsubsection{Length of ICU admission (days in ICU from admission to transfer to ward or death)}
 
